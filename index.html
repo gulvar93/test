@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RPG de Texto Idle - V10</title>
+    <title>RPG de Texto Idle</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -92,7 +92,7 @@
         .status-msg-clickable { cursor: pointer; background: rgba(255, 235, 59, 0.1); border: 1px dashed #ffeb3b; }
         .status-msg-clickable:hover { background: rgba(255, 235, 59, 0.2); }
         
-        /* Novas Raridades */
+        /* Raridades */
         .comum { color: #aaaaaa; } 
         .incomum { color: #4caf50; } 
         .raro { color: #2196f3; } 
@@ -109,8 +109,9 @@
         .border-potion { border-left-color: #e91e63; }
         
         .inv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .stat-bonus { color: #4caf50; font-size: 0.9em; }
+        .stat-bonus { color: #aaaaaa; font-size: 0.9em; }
         .item-desc { font-size: 11px; color: #aaa; font-style: italic; display: block; margin-bottom: 5px;}
+        .item-count { color: #fff; font-weight: bold; background: #333; padding: 2px 5px; border-radius: 4px; font-size: 11px; margin-left: 5px; }
 
         .add-stat-btn { background: #4caf50; padding: 2px 8px; font-size: 16px; margin-left: 10px; border-radius: 4px; border: none; width: auto; color: white; cursor: pointer; }
         #unspent-alert { color: #f44336; font-weight: bold; margin-bottom: 10px; text-align: center; }
@@ -138,14 +139,17 @@
         .boss-row td { border-color: #f44336; }
         .trap-risk { font-size: 10px; color: #ff9800; display: block; margin-top: 2px;}
 
-        /* Estilos da Wiki e Menus */
-        .ajustes-tabs { display: flex; gap: 10px; margin-bottom: 15px; }
-        .ajuste-tab-btn { flex: 1; padding: 10px; background: #333; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        .ajuste-tab-btn.active { background: #4caf50; }
+        /* Tabs internas genéricas */
+        .abas-internas { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        .aba-interna-btn { flex: 1; padding: 10px; background: #333; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; min-width: 60px;}
+        .aba-interna-btn.active { background: #4caf50; }
+
         .wiki-content { font-size: 13px; line-height: 1.6; }
         .wiki-content h4 { color: #4caf50; margin-bottom: 5px; border-bottom: 1px solid #444; padding-bottom: 5px; }
         .wiki-content table { font-size: 12px; }
         .wiki-content th, .wiki-content td { padding: 5px; text-align: center; }
+
+        .quick-potions-container { display:flex; gap:10px; margin-bottom:15px; background: #222; padding: 10px; border: 1px solid #444; border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -166,14 +170,27 @@
 
     <!-- 1. MENU PERSONAGEM -->
     <div id="menu-personagem" class="menu-section">
-        <h3>Atributos do Personagem</h3>
-        <div id="unspent-alert" class="hidden">Você tem <span id="stat-points">0</span> pontos para distribuir!</div>
-        <table>
-            <tr><td>💪 FORÇA</td><td id="stat-forca"></td><td><small>Dano, +2.5% Acerto</small></td></tr>
-            <tr><td>🛡️ DEFESA</td><td id="stat-defesa"></td><td><small>-20% Dano Recb., +0.5% Acerto</small></td></tr>
-            <tr><td>🧠 INTELIGÊNCIA</td><td id="stat-inteligencia"></td><td><small>+10 Energia Máx</small></td></tr>
-            <tr><td>❤️ SAÚDE</td><td id="stat-saude"></td><td><small>+10 HP Máx</small></td></tr>
-        </table>
+        <div class="abas-internas">
+            <button class="aba-interna-btn active" id="btn-tab-atributos" onclick="switchPersonagemTab('atributos')">📊 Atributos</button>
+            <button class="aba-interna-btn" id="btn-tab-conquistas" onclick="switchPersonagemTab('conquistas')">🏆 Conquistas</button>
+        </div>
+
+        <!-- ABA ATRIBUTOS -->
+        <div id="personagem-atributos">
+            <div id="unspent-alert" class="hidden">Você tem <span id="stat-points">0</span> pontos para distribuir!</div>
+            <table>
+                <tr><td>💪 FORÇA</td><td id="stat-forca"></td><td><small>Dano, +2.5% Acerto</small></td></tr>
+                <tr><td>🛡️ DEFESA</td><td id="stat-defesa"></td><td><small>-20% Dano Recb., +0.5% Acerto</small></td></tr>
+                <tr><td>🧠 INTELIGÊNCIA</td><td id="stat-inteligencia"></td><td><small>+10 Energia Máx</small></td></tr>
+                <tr><td>❤️ SAÚDE</td><td id="stat-saude"></td><td><small>+10 HP Máx</small></td></tr>
+            </table>
+        </div>
+
+        <!-- ABA CONQUISTAS -->
+        <div id="personagem-conquistas" class="hidden">
+            <p>Complete objetivos para desbloquear estas marcas em sua jornada.</p>
+            <div id="achievements-list"></div>
+        </div>
     </div>
 
     <!-- 2. MENU INVENTÁRIO -->
@@ -181,13 +198,17 @@
         <h3>Equipamento Atual</h3>
         <div id="equip-slots" class="inv-grid"></div>
         <hr style="border-color:#444; margin: 20px 0;">
-        <h3>Mochila <button class="action-btn buy-btn" style="float:right; width:auto;" onclick="sellAllTrash()">💰 Vender Lixos</button></h3>
+        <h3>Mochila (<span id="inv-count">0</span>/8) <button class="action-btn buy-btn" style="float:right; width:auto;" onclick="sellAllTrash()">💰 Vender Lixos</button></h3>
         <div id="inventory-list"></div>
     </div>
 
     <!-- 3. MENU CAÇAR -->
     <div id="menu-cacar" class="menu-section hidden">
         <h3>Áreas de Caça</h3>
+        <div class="quick-potions-container">
+            <button class="buy-btn" id="btn-quick-hp" onclick="quickUsePotion('hp')">❤️ Poção HP (0)</button>
+            <button class="buy-btn" id="btn-quick-en" onclick="quickUsePotion('energy')">⚡ Poção EN (0)</button>
+        </div>
         <div class="zone-tabs" id="zone-tabs-container"></div>
         <div id="zone-content-container"></div>
     </div>
@@ -195,15 +216,15 @@
     <!-- 4. MENU MISSÕES -->
     <div id="menu-missoes" class="menu-section hidden">
         <h3>Mural de Recompensas</h3>
-        <p>Conclua objetivos para ganhar moedas.<br>Progresso da Chave do Chefe: <strong id="boss-key-progress">0/3</strong> 🔑</p>
-        <p>Chaves disponíveis: <strong id="boss-keys-amount">0</strong></p>
+        <p>Conclua objetivos para ganhar moedas.<br>Progresso da Próxima Chave: <strong id="boss-key-progress">0/3</strong> 🔑</p>
+        <p><small><em>As Chaves do Chefe são enviadas para a sua mochila (se houver espaço).</em></small></p>
         <div id="quest-list"></div>
     </div>
     
     <!-- 5. MENU LOJA -->
     <div id="menu-loja" class="menu-section hidden">
         <h3>Mercado da Cidade</h3>
-        <p>Compre itens e poções.<br>Ouro Atual: <strong id="shop-gold">0</strong>🪙</p>
+        <p>Compre itens e poções. <small>(Estoque totalmente renovado a cada zona desbloqueada).</small><br>Ouro Atual: <strong id="shop-gold">0</strong>🪙</p>
         <div id="loja-list"></div>
     </div>
 
@@ -214,11 +235,13 @@
         <div id="house-list"></div>
     </div>
 
-    <!-- 7. MENU AJUSTES (Substitui o Log) -->
+    <!-- 7. MENU AJUSTES -->
     <div id="menu-ajustes" class="menu-section hidden">
-        <div class="ajustes-tabs">
-            <button class="ajuste-tab-btn active" id="btn-tab-log" onclick="switchAjustesTab('log')">📜 Ver Log</button>
-            <button class="ajuste-tab-btn" id="btn-tab-wiki" onclick="switchAjustesTab('wiki')">📖 Ver Wiki</button>
+        <div class="abas-internas">
+            <button class="aba-interna-btn active" id="btn-tab-log" onclick="switchAjustesTab('log')">📜 Log</button>
+            <button class="aba-interna-btn" id="btn-tab-wiki" onclick="switchAjustesTab('wiki')">📖 Wiki</button>
+            <button class="aba-interna-btn" id="btn-tab-codex" onclick="switchAjustesTab('codex')">🗂️ Codex</button>
+            <button class="aba-interna-btn" id="btn-tab-dados" onclick="switchAjustesTab('dados')">💾 Dados</button>
         </div>
         
         <!-- SUBMENU LOG -->
@@ -229,9 +252,12 @@
 
         <!-- SUBMENU WIKI -->
         <div id="ajustes-wiki" class="hidden wiki-content">
-            <h3>Enciclopédia do Jogo (Wiki)</h3>
+            <h3>Enciclopédia do Jogo (Versão 15)</h3>
             
-            <h4>1. Taxas de Drop de Equipamentos</h4>
+            <h4>1. Limite da Mochila e Saves</h4>
+            <p>Sua mochila pode carregar apenas <strong>8 itens</strong> simultaneamente. Se não houver espaço, novos itens de chefes ou inimigos serão irremediavelmente perdidos. O jogo salva o progresso automaticamente a cada 10 segundos.</p>
+
+            <h4>2. Taxas de Drop de Equipamentos</h4>
             <p>Os itens largados por inimigos comuns variam de acordo com a área. Os Chefes dropam 1 item Lendário garantido.</p>
             <table>
                 <tr>
@@ -242,31 +268,27 @@
                     <th class="epico">Roxo</th>
                     <th class="lendario">Dour.</th>
                 </tr>
-                <tr><td>Floresta</td><td>70%</td><td>24.5%</td><td>5%</td><td>0.4%</td><td>0.1%</td></tr>
-                <tr><td>Montanhas</td><td>50%</td><td>30%</td><td>15%</td><td>4%</td><td>1%</td></tr>
-                <tr><td>Inferno</td><td>30%</td><td>35%</td><td>22%</td><td>10%</td><td>3%</td></tr>
+                <tr><td>Floresta (Nv 1)</td><td>70%</td><td>24.5%</td><td>5%</td><td>0.4%</td><td>0.1%</td></tr>
+                <tr><td>Montanhas (Nv 5)</td><td>50%</td><td>30%</td><td>15%</td><td>4%</td><td>1%</td></tr>
+                <tr><td>Inferno (Nv 10)</td><td>30%</td><td>35%</td><td>22%</td><td>10%</td><td>3%</td></tr>
             </table>
 
-            <h4>2. Multiplicadores de Raridade</h4>
-            <p>O poder (Atributo Base) da arma muda de acordo com sua raridade. Uma arma de dano base 2 multiplica para:</p>
-            <ul>
-                <li><span class="comum">Comum (Cinza):</span> x1 (Total: 2)</li>
-                <li><span class="incomum">Incomum (Verde):</span> x2 (Total: 4)</li>
-                <li><span class="raro">Raro (Azul):</span> x3 (Total: 6)</li>
-                <li><span class="epico">Épico (Roxo):</span> x5 (Total: 10)</li>
-                <li><span class="lendario">Lendário (Dourado):</span> x8 (Total: 16)</li>
-            </ul>
+            <h4>3. Combate, Acerto e Fuga</h4>
+            <p><strong>Cálculo de Acerto:</strong> Chance Base Inimigo + (Força * 2.5) + (Defesa * 0.5) +/- Modificadores de Armas. O limite máximo de sucesso absoluto é travado em <strong>95%</strong>, não importa sua força.</p>
+            <p><strong>Fuga e Prisão:</strong> Caso erre o ataque e receba dano, há 10% de chance (reduzido para 5% com Arco) de ficar <strong>Preso</strong>. Impede a ação por 30 minutos ou até pagar 5 moedas de ouro.</p>
+        </div>
 
-            <h4>3. Mecânica de Acerto e Fuga</h4>
-            <p><strong>Cálculo de Acerto:</strong> Chance Base Inimigo + (Força * 2.5) + (Defesa * 0.5) +/- Modificadores de Armas. Limite: 5% a 95%.</p>
-            <p><strong>Fuga (Prisão):</strong> Caso erre o ataque e receba dano, há 20% de chance (reduzido para 10% caso use um Arco) do herói ficar <strong>Preso</strong> no cenário. Estar preso lhe impede de agir por 30 minutos ou até pagar 5 moedas de ouro clicando no status.</p>
+        <!-- SUBMENU CODEX -->
+        <div id="ajustes-codex" class="hidden wiki-content">
+            <!-- Gerado dinamicamente via JS -->
+        </div>
 
-            <h4>4. Desmaio e Combate</h4>
-            <p>Se seus pontos de vida (HP) chegarem a 0, você ficará desmaiado por 30 minutos (também pode pagar 5 ouro para acordar instantaneamente clicando no status do topo).</p>
-            <p>Usar um Cajado de Cura passivamente reduz o dano que você toma ao falhar um ataque em 30%.</p>
-            
-            <h4>5. Como liberar os Chefes</h4>
-            <p>Você acumula 1 Chave do Chefe a cada 3 Missões do Mural completadas. Chefes são as únicas fontes com 100% de chance de drops Lendários e Poções juntas.</p>
+        <!-- SUBMENU DADOS -->
+        <div id="ajustes-dados" class="hidden wiki-content">
+            <h3>Gerenciamento de Save</h3>
+            <p>O jogo salva automaticamente o seu progresso a cada 10 segundos.</p>
+            <button class="action-btn buy-btn" onclick="saveGame(true)" style="padding:15px; margin-bottom:10px; background:#2196f3; font-weight:bold;">💾 Forçar Salvamento Manual</button>
+            <button class="action-btn" onclick="resetGame()" style="padding:15px; background:#f44336; font-weight:bold; color:white;">🗑️ Apagar Progresso (Resetar Tudo)</button>
         </div>
     </div>
 </div>
@@ -276,8 +298,9 @@
         <button class="nav-btn active" id="nav-personagem" onclick="showMenu('personagem')">
             👤<span id="badge-personagem" class="badge hidden">!</span><span class="label">Status</span>
         </button>
+        <!-- BADGE DA MOCHILA INCLUÍDO AQUI -->
         <button class="nav-btn" id="nav-inventario" onclick="showMenu('inventario')">
-            🎒<span class="label">Mochila</span>
+            🎒<span id="badge-inventario" class="badge hidden">!</span><span class="label">Mochila</span>
         </button>
         <button class="nav-btn" id="nav-cacar" onclick="showMenu('cacar')">
             🏹<span class="label">Caçar</span>
@@ -321,6 +344,9 @@
 </div>
 
 <script>
+    // --- CONSTANTES ---
+    const MAX_INVENTORY = 8;
+
     // --- ESTADO DO JOGO ---
     let player = {
         level: 1, exp: 0, expNext: 100, gold: 5,
@@ -328,45 +354,45 @@
         statPoints: 0, stats: { forca: 5, defesa: 5, inteligencia: 5, saude: 10 },
         inventory: [],
         equipped: { cabeca: null, corpo: null, mao_esq: null, mao_dir: null, pes: null },
-        houseIndex: 0, questsCompleted: 0, bossKeys: 0
+        houseIndex: 0, questsCompleted: 0,
+        statsData: { enemiesKilled: 0 },
+        achievements: []
     };
 
-    let state = { cooldown: 0, faintedTime: 0, trappedTime: 0, activeZoneTab: 0, hpTick: 0 };
+    let state = { 
+        cooldown: 0, faintedTime: 0, trappedTime: 0, activeZoneTab: 0, hpTick: 0, shopItems: [],
+        hasNewItem: false
+    };
+    let activeQuests = [];
 
     // --- BANCOS DE DADOS ---
     const houses = [
         { name: 'Nenhuma (Rua)', emoji: '🛤️', hpRegen: 0.005, enRegen: 0.2, price: 0, desc: '+0.5% HP (2s) | +0.2 EN/s' },
-        { name: 'Cabana', emoji: '🏕️', hpRegen: 0.010, enRegen: 0.4, price: 500, desc: '+1.0% HP (2s) | +0.4 EN/s' },
-        { name: 'Casa', emoji: '🏠', hpRegen: 0.015, enRegen: 0.6, price: 2000, desc: '+1.5% HP (2s) | +0.6 EN/s' },
-        { name: 'Forte', emoji: '🏰', hpRegen: 0.020, enRegen: 1.0, price: 10000, desc: '+2.0% HP (2s) | +1.0 EN/s' },
-        { name: 'Castelo', emoji: '👑', hpRegen: 0.035, enRegen: 2.0, price: 50000, desc: '+3.5% HP (2s) | +2.0 EN/s' }
+        { name: 'Cabana', emoji: '🏕️', hpRegen: 0.010, enRegen: 0.4, price: 200, desc: '+1.0% HP (2s) | +0.4 EN/s' },
+        { name: 'Casa', emoji: '🏠', hpRegen: 0.015, enRegen: 0.6, price: 800, desc: '+1.5% HP (2s) | +0.6 EN/s' },
+        { name: 'Forte', emoji: '🏰', hpRegen: 0.020, enRegen: 1.0, price: 3000, desc: '+2.0% HP (2s) | +1.0 EN/s' },
+        { name: 'Castelo', emoji: '👑', hpRegen: 0.035, enRegen: 2.0, price: 10000, desc: '+3.5% HP (2s) | +2.0 EN/s' }
     ];
 
     const equipTypes = [
-        // Armas (slot: hand)
         { name: 'Espada Curta', slot: 'hand', hands: 1, stat: 'forca', baseVal: 2, desc: 'Arma básica (1 Mão)' },
         { name: 'Espada Longa', slot: 'hand', hands: 2, stat: 'forca', baseVal: 4, desc: 'Dano alto (2 Mãos)' },
         { name: 'Machado Curto', slot: 'hand', hands: 1, stat: 'forca', baseVal: 3, desc: 'Dano moderado (1 Mão)' },
         { name: 'Machado de Batalha', slot: 'hand', hands: 2, stat: 'forca', baseVal: 5, desc: 'Dano massivo (2 Mãos)' },
         { name: 'Adaga', slot: 'hand', hands: 1, stat: 'forca', baseVal: 1, special: 'adaga', desc: '-4 Custo EN | -10% Acerto (1 Mão)' },
-        { name: 'Arco', slot: 'hand', hands: 2, stat: 'forca', baseVal: 3, special: 'arco', desc: 'Reduz chance de Prisão na fuga (2 Mãos)' },
-        { name: 'Cajado de Cura', slot: 'hand', hands: 2, stat: 'forca', baseVal: 2, special: 'cajado', desc: '-30% Dano recebido ao falhar (2 Mãos)' },
-        // Escudo
+        { name: 'Arco', slot: 'hand', hands: 2, stat: 'forca', baseVal: 3, special: 'arco', desc: 'Reduz chance de Prisão (2 Mãos)' },
+        { name: 'Cajado de Cura', slot: 'hand', hands: 2, stat: 'forca', baseVal: 2, special: 'cajado', desc: '-30% Dano recebido (2 Mãos)' },
         { name: 'Escudo', slot: 'hand', hands: 1, stat: 'defesa', baseVal: 2, desc: 'Proteção extra (1 Mão)' },
-        // Corpo
         { name: 'Armadura de Couro', slot: 'corpo', hands: 0, stat: 'defesa', baseVal: 2, desc: 'Proteção leve' },
         { name: 'Armadura de Placas', slot: 'corpo', hands: 0, stat: 'defesa', baseVal: 4, desc: 'Proteção pesada' },
-        // Cabeça
         { name: 'Bandana', slot: 'cabeca', hands: 0, stat: 'defesa', baseVal: 1, desc: 'Leve' },
         { name: 'Capuz', slot: 'cabeca', hands: 0, stat: 'defesa', baseVal: 1, desc: 'Furtivo' },
         { name: 'Elmo', slot: 'cabeca', hands: 0, stat: 'defesa', baseVal: 2, desc: 'Proteção dura' },
         { name: 'Chapéu de Mago', slot: 'cabeca', hands: 0, stat: 'inteligencia', baseVal: 2, desc: 'Aumenta Inteligência' },
-        // Pés
         { name: 'Sandálias', slot: 'pes', hands: 0, stat: 'defesa', baseVal: 1, desc: 'Leve' },
         { name: 'Botas', slot: 'pes', hands: 0, stat: 'defesa', baseVal: 2, desc: 'Resistente' }
     ];
 
-    // Novas Raridades Reformuladas
     const rarities = [
         { id: 'comum', name: 'Comum', color: 'comum', mult: 1 },
         { id: 'incomum', name: 'Incomum', color: 'incomum', mult: 2 },
@@ -375,14 +401,18 @@
         { id: 'lendario', name: 'Lendário', color: 'lendario', mult: 8 }
     ];
 
-    // Array com as chances de drop (em %) [Comum, Incomum, Raro, Épico, Lendário]
     const dropRates = [
         [70.0, 24.5, 5.0, 0.4, 0.1], // Floresta
         [50.0, 30.0, 15.0, 4.0, 1.0], // Montanhas
         [30.0, 35.0, 22.0, 10.0, 3.0] // Inferno
     ];
+    
+    const shopRarityRates = [
+        [70.0, 30.0, 0, 0, 0],   // Z0: Floresta
+        [40.0, 40.0, 20.0, 0, 0],  // Z1: Montanhas
+        [10.0, 30.0, 40.0, 20.0, 0]  // Z2: Inferno
+    ];
 
-    // Zonas agora possuem desbloqueio por nível e custo de energia por inimigo
     const zones = [
         { name: 'Floresta', emoji: '🌲', reqLevel: 1, enemies: [
             { name: 'Javali', emoji: '🐗', baseChance: 40, exp: 20, gold: 5, dmg: 10, energyCost: 5 },
@@ -390,13 +420,13 @@
             { name: 'Orc', emoji: '👹', baseChance: -10, exp: 100, gold: 40, dmg: 40, energyCost: 12 },
             { name: 'Líder Orc', emoji: '🧌', baseChance: -50, exp: 300, gold: 100, dmg: 70, energyCost: 15, isBoss: true }
         ]},
-        { name: 'Montanhas', emoji: '⛰️', reqLevel: 3, enemies: [
+        { name: 'Montanhas', emoji: '⛰️', reqLevel: 5, enemies: [
             { name: 'Harpia', emoji: '🦅', baseChance: -30, exp: 250, gold: 80, dmg: 70, energyCost: 18 },
             { name: 'Ogro', emoji: '🧌', baseChance: -60, exp: 400, gold: 120, dmg: 120, energyCost: 25 },
             { name: 'Gigante', emoji: '🗿', baseChance: -100, exp: 800, gold: 250, dmg: 200, energyCost: 35 },
             { name: 'Lich', emoji: '💀', baseChance: -200, exp: 2000, gold: 500, dmg: 350, energyCost: 40, isBoss: true }
         ]},
-        { name: 'Inferno', emoji: '🔥', reqLevel: 6, enemies: [
+        { name: 'Inferno', emoji: '🔥', reqLevel: 10, enemies: [
             { name: 'Cultista', emoji: '🧙‍♂️', baseChance: -150, exp: 2000, gold: 500, dmg: 350, energyCost: 50 },
             { name: 'Dragão', emoji: '🐉', baseChance: -250, exp: 5000, gold: 1500, dmg: 800, energyCost: 80 },
             { name: 'Demônio', emoji: '👿', baseChance: -400, exp: 15000, gold: 5000, dmg: 2000, energyCost: 120 },
@@ -405,36 +435,102 @@
     ];
 
     const trashItems = ['Dente Quebrado', 'Pedaço de Pano', 'Pele Rasgada', 'Garra Suja', 'Osso Rachado'];
-
-    const shopList = [
-        { type: 'equip', eIdx: 0, price: 50 }, 
-        { type: 'equip', eIdx: 4, price: 60 }, 
-        { type: 'equip', eIdx: 8, price: 70 }, 
-        { type: 'equip', eIdx: 10, price: 40 }, 
-        { type: 'equip', eIdx: 14, price: 40 }, 
-        { type: 'potion', pType: 'hp', price: 30 },
-        { type: 'potion', pType: 'energy', price: 30 }
+    
+    const achievementsDb = [
+        { id: 'cacador', name: 'Caçador', desc: 'Derrote 30 inimigos.', diff: 'Fácil' },
+        { id: 'explorador', name: 'Explorador', desc: 'Desbloqueie todas as zonas.', diff: 'Médio' },
+        { id: 'rei', name: 'Rei', desc: 'Obtenha um Castelo.', diff: 'Difícil' }
     ];
 
-    const questPool = [
-        { desc: 'Derrote 3 Javalis', req: 3, reward: 25, type: 'kill', category: 'caça_javali', target: 'Javali' },
-        { desc: 'Derrote 2 Bandidos', req: 2, reward: 35, type: 'kill', category: 'caça_bandido', target: 'Bandido' },
-        { desc: 'Derrote 2 Orcs', req: 2, reward: 50, type: 'kill', category: 'caça_orc', target: 'Orc' },
-        { desc: 'Compre 1 item na Loja', req: 1, reward: 40, type: 'buy', category: 'loja' },
-        { desc: 'Venda 5 Lixos', req: 5, reward: 20, type: 'sell', category: 'venda_lixo' }
-    ];
-    let activeQuests = [];
+    // --- SALVAMENTO E CARREGAMENTO ---
+    function saveGame(manual = false) {
+        let saveObj = { player: player, state: state, activeQuests: activeQuests };
+        localStorage.setItem('mh_save_v15', JSON.stringify(saveObj));
+        if(manual) { logConsole("💾 Progresso salvo manualmente!"); showPopup("Progresso salvo com sucesso!"); }
+    }
+
+    function loadGame() {
+        let saved = localStorage.getItem('mh_save_v15') || localStorage.getItem('mh_save_v14') || localStorage.getItem('mh_save_v13') || localStorage.getItem('mh_save_v12');
+        if (saved) {
+            let parsed = JSON.parse(saved);
+            player = {...player, ...parsed.player};
+            state = {...state, ...parsed.state};
+            activeQuests = parsed.activeQuests || [];
+            
+            if(!player.statsData) player.statsData = { enemiesKilled: 0 };
+            if(!player.achievements) player.achievements = [];
+            if(state.hasNewItem === undefined) state.hasNewItem = false;
+            
+            if(player.bossKeys !== undefined && player.bossKeys > 0) {
+                for(let i=0; i<player.bossKeys; i++) grantBossKey();
+                delete player.bossKeys;
+            }
+
+            logConsole("💾 Progresso carregado com sucesso!");
+            return true;
+        }
+        return false;
+    }
+
+    function resetGame() {
+        if(confirm("ATENÇÃO: Você tem certeza que deseja apagar todo o seu progresso? Isso não poderá ser desfeito.")) {
+            localStorage.removeItem('mh_save_v15');
+            localStorage.removeItem('mh_save_v14');
+            localStorage.removeItem('mh_save_v13');
+            localStorage.removeItem('mh_save_v12');
+            location.reload();
+        }
+    }
 
     // --- INICIALIZAÇÃO ---
     function init() {
-        calcMaxStats(); player.hp = player.maxHp; player.energy = player.maxEnergy;
-        logConsole("Bem-vindo ao mundo! O jogo começou.");
+        let isLoaded = loadGame();
+        calcMaxStats();
+        
+        if (!isLoaded) {
+            player.hp = player.maxHp; 
+            player.energy = player.maxEnergy;
+            logConsole("Bem-vindo ao mundo! O jogo começou.");
+        }
+        
         while(activeQuests.length < 3) activeQuests.push(generateUniqueQuest());
-        renderZones(); renderInventory(); renderLoja(); renderCasa(); renderMissoes(); updateUI();
+        if(!state.shopItems || state.shopItems.length === 0) generateShop();
+        
+        renderCodex();
+        renderZones(); renderInventory(); renderLoja(); renderCasa(); renderMissoes(); renderAchievements(); updateUI();
+        
+        // Intervalos restaurados
         setInterval(gameLoop, 1000); 
+        setInterval(saveGame, 10000); // Salva a cada 10 segundos
+    }
+
+    function renderCodex() {
+        const codexDiv = document.getElementById('ajustes-codex');
+        let html = `<h3>Codex de Itens</h3>`;
+        html += `<h4>Equipamentos Base</h4><table><tr><th>Nome</th><th>Tipo</th><th>Efeito Base</th></tr>`;
+        equipTypes.forEach(e => {
+            let effect = e.stat === 'forca' ? `+${e.baseVal} FOR` : e.stat === 'defesa' ? `+${e.baseVal} DEF` : `+${e.baseVal} INT`;
+            html += `<tr><td>${e.name}</td><td>${e.slot.toUpperCase()}</td><td>${effect} <br><small>${e.desc}</small></td></tr>`;
+        });
+        html += `</table><h4>Raridades (Multiplicadores)</h4><ul>`;
+        rarities.forEach(r => { html += `<li><span class="${r.color}">${r.name}</span>: x${r.mult} no Atributo Base</li>`; });
+        html += `</ul><h4>Consumíveis / Especiais</h4><ul>
+        <li>❤️ Poção de Vida: Restaura 50% do HP Máx</li>
+        <li>⚡ Poção de Energia: Restaura 50% da EN Máx</li>
+        <li>🔑 Chave do Chefe: Permite o acesso a um confronto com um Chefe. Consumida no uso.</li>
+        </ul>`;
+        codexDiv.innerHTML = html;
     }
 
     // --- CÁLCULOS COMBATE E STATUS ---
+    function getHighestZoneIndex() {
+        let maxIdx = 0;
+        for(let i=0; i<zones.length; i++) {
+            if(player.level >= zones[i].reqLevel) maxIdx = i;
+        }
+        return maxIdx;
+    }
+
     function getStat(statName) {
         let total = player.stats[statName];
         for (let key in player.equipped) {
@@ -454,7 +550,7 @@
         let hasAdaga = (eD?.special === 'adaga' || eE?.special === 'adaga');
         let hasArco = (eD?.special === 'arco');
         let hasCajado = (eD?.special === 'cajado');
-        let trapChance = hasArco ? 10 : 20; // 10% ou 20%
+        let trapChance = hasArco ? 5 : 10; 
         return { hasAdaga, hasArco, hasCajado, trapChance };
     }
 
@@ -481,7 +577,7 @@
     function handleStatusClick() {
         if(state.faintedTime > 0) {
             document.getElementById('revive-title').innerText = "💀 Desmaiado!";
-            document.getElementById('revive-desc').innerHTML = "Você perdeu todo seu HP.<br><br>Deseja pagar <strong>5 Ouro</strong> para se recuperar instantaneamente?";
+            document.getElementById('revive-desc').innerHTML = "Você perdeu todo seu HP.<br><br>Deseja pagar <strong>5 Ouro</strong> para curar seu HP instantaneamente?";
             document.getElementById('btn-revive-pay').disabled = (player.gold < 5);
             document.getElementById('revive-overlay').classList.remove('hidden');
         } else if (state.trappedTime > 0) {
@@ -496,7 +592,7 @@
         if(pay && player.gold >= 5) {
             player.gold -= 5;
             if(state.faintedTime > 0) {
-                player.hp = player.maxHp; player.energy = player.maxEnergy;
+                player.hp = player.maxHp;
                 logConsole("✨ Você pagou 5 Ouro e se recuperou do desmaio!");
             } else {
                 logConsole("💨 Você pagou 5 Ouro e conseguiu escapar da armadilha!");
@@ -505,14 +601,64 @@
         }
         closePopup('revive-overlay'); updateUI();
     }
+    
+    // --- CONQUISTAS ---
+    function checkAchievements() {
+        let unlocked = false;
 
-    // --- MISSÕES & CHAVES ---
+        if(player.statsData.enemiesKilled >= 30 && !player.achievements.includes('cacador')) {
+            player.achievements.push('cacador'); unlocked = true; logConsole("🏆 Conquista Desbloqueada: Caçador!");
+        }
+        if(player.level >= 10 && !player.achievements.includes('explorador')) {
+            player.achievements.push('explorador'); unlocked = true; logConsole("🏆 Conquista Desbloqueada: Explorador!");
+        }
+        if(player.houseIndex >= 4 && !player.achievements.includes('rei')) {
+            player.achievements.push('rei'); unlocked = true; logConsole("🏆 Conquista Desbloqueada: Rei!");
+        }
+        if(unlocked) renderAchievements();
+    }
+
+    function renderAchievements() {
+        const div = document.getElementById('achievements-list');
+        if(!div) return;
+        div.innerHTML = '';
+        achievementsDb.forEach(ach => {
+            let isUnlocked = player.achievements.includes(ach.id);
+            let color = isUnlocked ? '#4caf50' : '#555';
+            div.innerHTML += `
+            <div style="border: 1px solid ${color}; padding: 10px; margin-bottom: 5px; border-radius: 4px; background: #222;">
+                <strong style="color:${color}">${ach.name}</strong> <small>(${ach.diff})</small><br>
+                <span style="font-size: 11px; color: ${isUnlocked ? '#ccc' : '#777'}">${ach.desc}</span>
+                <div style="font-size: 10px; margin-top:5px; color:${color}">${isUnlocked ? '✅ Desbloqueado' : '🔒 Bloqueado'}</div>
+            </div>`;
+        });
+    }
+
+    // --- MISSÕES DINÂMICAS ---
     function generateUniqueQuest() {
-        let available = questPool.filter(qp => !activeQuests.some(aq => aq.category === qp.category));
+        let maxZoneIdx = getHighestZoneIndex();
+        let currentZone = zones[maxZoneIdx];
+        let pool = [];
+        
+        currentZone.enemies.forEach(e => {
+            if(e.isBoss) return;
+            let reqAmt = Math.floor(Math.random() * 3) + 2; 
+            let reward = Math.floor(e.gold * reqAmt * 1.5) + (maxZoneIdx * 30) + 15; 
+            pool.push({
+                desc: `Derrote ${reqAmt}x ${e.name}`, req: reqAmt, reward: reward, type: 'kill', category: `caça_${e.name}`, target: e.name
+            });
+        });
+
+        pool.push({ desc: 'Compre 1 item na Loja', req: 1, reward: 35 + (maxZoneIdx * 20), type: 'buy', category: 'loja' });
+        pool.push({ desc: 'Venda 5 Lixos', req: 5, reward: 20 + (maxZoneIdx * 10), type: 'sell', category: 'venda_lixo' });
+
+        let available = pool.filter(qp => !activeQuests.some(aq => aq.category === qp.category));
         if (available.length === 0) return null;
+        
         let q = available[Math.floor(Math.random() * available.length)];
         return { ...q, progress: 0, uid: Date.now() + Math.random() };
     }
+
     function updateQuest(type, amount, extra = null) {
         let changed = false;
         activeQuests.forEach(q => {
@@ -524,6 +670,7 @@
         });
         if (changed) { renderMissoes(); updateUI(); }
     }
+    
     function renderMissoes() {
         const container = document.getElementById('quest-list'); container.innerHTML = '';
         activeQuests.forEach(q => {
@@ -542,6 +689,20 @@
             </div>`;
         });
     }
+
+    function grantBossKey() {
+        if(player.inventory.length < MAX_INVENTORY) {
+            player.inventory.push({
+                id: Date.now()+Math.random(), name: 'Chave do Chefe', emoji: '🔑', type: 'key', desc: 'Consumível usado para acessar um Chefe.', sellPrice: 0
+            });
+            state.hasNewItem = true;
+            logConsole(`🔑 <strong>Parabéns!</strong> Uma Chave do Chefe foi guardada na sua mochila.`);
+        } else {
+            logConsole(`❌ <strong>Aviso:</strong> Você ganhou uma Chave do Chefe, mas perdeu porque sua mochila estava cheia!`);
+            showPopup("Sua mochila estava cheia e você perdeu a Chave do Chefe de recompensa das missões.");
+        }
+    }
+
     function claimQuest(uid) {
         let idx = activeQuests.findIndex(q => q.uid === uid);
         if (idx > -1 && activeQuests[idx].progress >= activeQuests[idx].req) {
@@ -549,29 +710,65 @@
             logConsole(`✅ Missão Concluída! Ganhou ${activeQuests[idx].reward} Ouro.`);
             player.questsCompleted++;
             if(player.questsCompleted >= 3) {
-                player.questsCompleted -= 3; player.bossKeys++;
-                logConsole(`🔑 <strong>Parabéns!</strong> Você obteve uma Chave do Chefe.`);
+                player.questsCompleted -= 3;
+                grantBossKey();
             }
             activeQuests.splice(idx, 1);
             let newQ = generateUniqueQuest(); if(newQ) activeQuests.push(newQ);
-            renderMissoes(); renderZones(); updateUI();
+            renderMissoes(); renderZones(); updateUI(); renderInventory();
         }
     }
 
     // --- LOJA & CASAS ---
+    function generateShop() {
+        state.shopItems = [];
+        let maxZoneIdx = getHighestZoneIndex();
+        let rates = shopRarityRates[Math.min(maxZoneIdx, 2)];
+        
+        for(let i=0; i<3; i++) {
+            let roll = Math.random() * 100;
+            let rIdx = 0, acc = 0;
+            for(let j=0; j<rates.length; j++) {
+                acc += rates[j];
+                if(roll <= acc) { rIdx = j; break; }
+            }
+            let rarity = rarities[rIdx];
+            let type = equipTypes[Math.floor(Math.random() * 16)];
+            while(!type.statValue && !type.baseVal) type = equipTypes[0]; 
+            
+            let baseVal = type.baseVal + (maxZoneIdx * 2);
+            let finalStat = baseVal * rarity.mult;
+            let buyPrice = baseVal * rarity.mult * 45; 
+            
+            state.shopItems.push({
+                type: 'equip', bought: false, price: buyPrice,
+                itemData: { name: type.name, type: 'equip', slot: type.slot, stat: type.stat, hands: type.hands, special: type.special, desc: type.desc, statValue: finalStat, rarity: rarity, sellPrice: baseVal*rarity.mult*15 }
+            });
+        }
+        
+        state.shopItems.push({ type: 'potion', pType: 'hp', price: 30, bought: false });
+        state.shopItems.push({ type: 'potion', pType: 'energy', price: 30, bought: false });
+        
+        if (document.getElementById('loja-list')) renderLoja();
+    }
+
     function renderLoja() {
         const container = document.getElementById('loja-list'); container.innerHTML = '';
-        shopList.forEach((si, idx) => {
+        state.shopItems.forEach((si, idx) => {
+            let btnHtml = si.bought ? 
+                `<button class="buy-btn" disabled>Esgotado</button>` : 
+                `<button class="buy-btn" id="btn-buy-${idx}" onclick="buyLojaItem(${idx})">🪙 ${si.price}</button>`;
+
             if(si.type === 'equip') {
-                let eq = equipTypes[si.eIdx];
+                let eq = si.itemData;
                 container.innerHTML += `
                 <div class="shop-item">
                     <div class="shop-info">
-                        <strong>${eq.name}</strong><br>
+                        <strong class="${eq.rarity.color}">${eq.name}</strong><br>
                         <span class="item-desc">${eq.desc}</span>
-                        <small class="stat-bonus">+${eq.baseVal} ${eq.stat.toUpperCase()}</small>
+                        <small class="stat-bonus">+${eq.statValue} ${eq.stat.toUpperCase()}</small>
                     </div>
-                    <div class="shop-btn-container"><button class="buy-btn" id="btn-buy-${idx}" onclick="buyLojaItem(${idx})">🪙 ${si.price}</button></div>
+                    <div class="shop-btn-container">${btnHtml}</div>
                 </div>`;
             } else {
                 let isHp = si.pType === 'hp';
@@ -581,22 +778,29 @@
                         <strong>${isHp?'❤️':'⚡'} Poção de ${isHp?'Vida':'Energia'}</strong><br>
                         <span class="item-desc">Restaura 50%</span>
                     </div>
-                    <div class="shop-btn-container"><button class="buy-btn" id="btn-buy-${idx}" onclick="buyLojaItem(${idx})">🪙 ${si.price}</button></div>
+                    <div class="shop-btn-container">${btnHtml}</div>
                 </div>`;
             }
         });
     }
+
     function buyLojaItem(idx) {
-        let si = shopList[idx];
+        let si = state.shopItems[idx];
+        if(si.bought) return;
+
+        if(player.inventory.length >= MAX_INVENTORY) {
+            showPopup("Sua mochila está cheia! Venda ou equipe itens antes de comprar.");
+            return;
+        }
+
         if (player.gold >= si.price) {
             player.gold -= si.price;
+            si.bought = true;
+            state.hasNewItem = true;
+            
             if(si.type === 'equip') {
-                let eq = equipTypes[si.eIdx];
-                let item = {
-                    id: Date.now() + Math.random(), name: eq.name, type: 'equip', slot: eq.slot, stat: eq.stat, hands: eq.hands,
-                    special: eq.special, desc: eq.desc, statValue: eq.baseVal, rarity: rarities[0], sellPrice: Math.floor(si.price/3) 
-                };
-                player.inventory.push(item); logConsole(`🛒 Comprou: ${item.name}.`);
+                player.inventory.push({...si.itemData, id: Date.now() + Math.random()}); 
+                logConsole(`🛒 Comprou: ${si.itemData.name}.`);
             } else {
                 let isHp = si.pType === 'hp';
                 player.inventory.push({
@@ -605,7 +809,7 @@
                 });
                 logConsole(`🛒 Comprou: Poção.`);
             }
-            updateQuest('buy', 1); renderInventory(); updateUI();
+            updateQuest('buy', 1); renderInventory(); renderLoja(); updateUI();
         }
     }
 
@@ -622,23 +826,34 @@
                 <div class="shop-btn-container">${btnHtml}</div></div>`;
         });
     }
+
     function buyHouse(idx) {
         let house = houses[idx];
         if (player.gold >= house.price && player.houseIndex < idx) {
             player.gold -= house.price; player.houseIndex = idx;
-            logConsole(`🏠 Mudou-se para: ${house.name}.`); renderCasa(); updateUI();
+            logConsole(`🏠 Mudou-se para: ${house.name}.`); 
+            checkAchievements();
+            renderCasa(); updateUI();
         }
     }
 
-    // --- MENU AJUSTES (WIKI/LOG) ---
+    // --- MENUS INTERNOS (AJUSTES & PERSONAGEM) ---
     function switchAjustesTab(tab) {
-        document.getElementById('btn-tab-log').classList.remove('active');
-        document.getElementById('btn-tab-wiki').classList.remove('active');
-        document.getElementById('ajustes-log').classList.add('hidden');
-        document.getElementById('ajustes-wiki').classList.add('hidden');
-
+        ['log', 'wiki', 'codex', 'dados'].forEach(t => {
+            document.getElementById('btn-tab-' + t).classList.remove('active');
+            document.getElementById('ajustes-' + t).classList.add('hidden');
+        });
         document.getElementById('btn-tab-' + tab).classList.add('active');
         document.getElementById('ajustes-' + tab).classList.remove('hidden');
+    }
+
+    function switchPersonagemTab(tab) {
+        ['atributos', 'conquistas'].forEach(t => {
+            document.getElementById('btn-tab-' + t).classList.remove('active');
+            document.getElementById('personagem-' + t).classList.add('hidden');
+        });
+        document.getElementById('btn-tab-' + tab).classList.add('active');
+        document.getElementById('personagem-' + tab).classList.remove('hidden');
     }
 
     // --- CAÇA & ABAS ---
@@ -646,6 +861,7 @@
         if (index === state.activeZoneTab) return;
         if (player.level >= zones[index].reqLevel) { state.activeZoneTab = index; renderZones(); }
     }
+    
     function renderZones() {
         const tabsContainer = document.getElementById('zone-tabs-container');
         const contentContainer = document.getElementById('zone-content-container');
@@ -663,14 +879,15 @@
         if (player.level >= activeZone.reqLevel) {
             let html = `<table><tr><th>Inimigo</th><th>Acerto</th><th>Ação</th></tr>`;
             let mods = getCombatModifiers();
+            let hasKey = player.inventory.some(i => i.type === 'key');
             
             activeZone.enemies.forEach((enemy, eIndex) => {
                 let rowClass = enemy.isBoss ? 'class="boss-row"' : '';
                 let btnHtml = `<button class="hunt-btn" id="btn-hunt-${state.activeZoneTab}-${eIndex}" onclick="hunt(${state.activeZoneTab}, ${eIndex})">Lutar</button>`;
                 
                 if (enemy.isBoss) {
-                    if (player.bossKeys > 0) btnHtml = `<button class="hunt-btn" id="btn-hunt-${state.activeZoneTab}-${eIndex}" style="background:#f44336; font-weight:bold;" onclick="hunt(${state.activeZoneTab}, ${eIndex})">Usar 1 🔑</button>`;
-                    else btnHtml = `<button class="hunt-btn" disabled>Bloqueado</button>`;
+                    if (hasKey) btnHtml = `<button class="hunt-btn" id="btn-hunt-${state.activeZoneTab}-${eIndex}" style="background:#f44336; font-weight:bold;" onclick="hunt(${state.activeZoneTab}, ${eIndex})">Usar Chave</button>`;
+                    else btnHtml = `<button class="hunt-btn" disabled>Precisa Chave</button>`;
                 }
 
                 let finalEn = getFinalEnergyCost(enemy.energyCost);
@@ -692,42 +909,58 @@
 
     function rollDrops(zIndex, isBoss = false) {
         let dropMessage = "";
+        let pendingItems = [];
+        
         if (isBoss) {
-            // Boss drops 1 Legendary
-            let rarity = rarities[4]; // Lendario
+            let rarity = rarities[4];
             let type = equipTypes[Math.floor(Math.random() * 16)];
-            while(!type.statValue) type = equipTypes[Math.floor(Math.random() * 16)]; 
+            while(!type.statValue && !type.baseVal) type = equipTypes[0]; 
             let baseVal = type.baseVal + (zIndex * 2); let finalStat = baseVal * rarity.mult;
-            let item = { id: Date.now()+Math.random(), name: type.name, type: 'equip', slot: type.slot, stat: type.stat, hands: type.hands, special: type.special, desc: type.desc, statValue: finalStat, rarity: rarity, sellPrice: baseVal*rarity.mult*15 };
-            player.inventory.push(item);
-            dropMessage += `✨ <strong>Recompensa!</strong> <span class="${rarity.color}">${item.name}</span> (+${finalStat} ${type.stat.toUpperCase()})<br>`;
-            let pot = generatePotion(); player.inventory.push(pot);
-            dropMessage += `🧪 <strong>Recompensa!</strong> ${pot.name}<br>`;
+            
+            pendingItems.push({ id: Date.now()+Math.random(), name: type.name, type: 'equip', slot: type.slot, stat: type.stat, hands: type.hands, special: type.special, desc: type.desc, statValue: finalStat, rarity: rarity, sellPrice: baseVal*rarity.mult*15 });
+            pendingItems.push(generatePotion());
         } else {
             if (Math.random() < 0.40) {
                 let trash = trashItems[Math.floor(Math.random() * trashItems.length)];
-                player.inventory.push({ name: trash, type: 'trash', sellPrice: (zIndex + 1)*3 + Math.floor(Math.random()*5) });
-                dropMessage += `📦 Dropou: ${trash}.<br>`;
+                pendingItems.push({ name: trash, type: 'trash', sellPrice: (zIndex + 1)*3 + Math.floor(Math.random()*5) });
             }
             if (Math.random() < 0.35) { 
                 let roll = Math.random() * 100; 
-                let rarity = rarities[0]; 
-                let acc = 0;
+                let rarity = rarities[0]; let acc = 0;
                 let zRates = dropRates[zIndex];
-                
-                for(let i=0; i<zRates.length; i++) {
-                    acc += zRates[i];
-                    if(roll <= acc) { rarity = rarities[i]; break; }
-                }
+                for(let i=0; i<zRates.length; i++) { acc += zRates[i]; if(roll <= acc) { rarity = rarities[i]; break; } }
                 
                 let type = equipTypes[Math.floor(Math.random() * 16)]; 
-                while(type.name === 'Poção de Vida') type = equipTypes[0]; 
+                while(!type.statValue && !type.baseVal) type = equipTypes[0]; 
+                
                 let baseVal = type.baseVal + (zIndex * 2); let finalStat = baseVal * rarity.mult;
-                let item = { id: Date.now()+Math.random(), name: type.name, type: 'equip', slot: type.slot, stat: type.stat, hands: type.hands, special: type.special, desc: type.desc, statValue: finalStat, rarity: rarity, sellPrice: baseVal*rarity.mult*15 };
-                player.inventory.push(item);
-                dropMessage += `✨ Pegou: <span class="${rarity.color}">${item.name}</span> (+${finalStat} ${type.stat.toUpperCase()})<br>`;
+                pendingItems.push({ id: Date.now()+Math.random(), name: type.name, type: 'equip', slot: type.slot, stat: type.stat, hands: type.hands, special: type.special, desc: type.desc, statValue: finalStat, rarity: rarity, sellPrice: baseVal*rarity.mult*15 });
             }
-            if (Math.random() < 0.15) { let pot = generatePotion(); player.inventory.push(pot); dropMessage += `🧪 Pegou: ${pot.name}<br>`; }
+            if (Math.random() < 0.15) pendingItems.push(generatePotion());
+        }
+
+        let freeSlots = MAX_INVENTORY - player.inventory.length;
+        if (pendingItems.length > 0) {
+            if (freeSlots <= 0) {
+                dropMessage += `<span style="color:#f44336">Mochila cheia! Itens perdidos.</span><br>`;
+                showPopup("Sua mochila está cheia! Alguns itens do monstro foram perdidos. Esvazie sua mochila.");
+            } else {
+                let limit = Math.min(pendingItems.length, freeSlots);
+                for(let i=0; i<limit; i++) {
+                    let item = pendingItems[i];
+                    player.inventory.push(item);
+                    state.hasNewItem = true;
+                    if(item.type === 'equip') dropMessage += `✨ <strong>Obteve:</strong> <span class="${item.rarity.color}">${item.name}</span> (+${item.statValue})<br>`;
+                    else if(item.type === 'potion') dropMessage += `🧪 <strong>Obteve:</strong> ${item.name}<br>`;
+                    else dropMessage += `📦 <strong>Obteve:</strong> ${item.name}<br>`;
+                }
+                if (pendingItems.length > freeSlots) {
+                    dropMessage += `<span style="color:#f44336">Mochila cheia! Alguns itens perdidos.</span><br>`;
+                    showPopup("Sua mochila encheu! Alguns itens não puderam ser recolhidos.");
+                }
+            }
+        } else {
+            dropMessage += "<em>Nenhum item dropou.</em>";
         }
         renderInventory(); return dropMessage;
     }
@@ -738,23 +971,31 @@
         let enemy = zones[zIndex].enemies[eIndex];
         let finalEn = getFinalEnergyCost(enemy.energyCost);
         let mods = getCombatModifiers();
+        let keyIndex = player.inventory.findIndex(i => i.type === 'key');
         
         if (player.energy < finalEn) return;
-        if (enemy.isBoss && player.bossKeys <= 0) return;
+        if (enemy.isBoss && keyIndex === -1) return;
 
         player.energy -= finalEn;
+        if (enemy.isBoss) { 
+            player.inventory.splice(keyIndex, 1); 
+            logConsole(`🔑 Você utilizou uma Chave do Chefe para acessar a batalha!`);
+        }
+
         let chance = getChance(zIndex, eIndex);
         let actionMessage = "";
 
         if ((Math.random() * 100) <= chance) {
             player.exp += enemy.exp; player.gold += enemy.gold;
+            player.statsData.enemiesKilled++;
+            
             actionMessage = `<strong>Vitória sobre o ${enemy.emoji} ${enemy.name}!</strong><br>Ganhou ${enemy.exp} EXP e ${enemy.gold} Ouro.<br><br>`;
             if(!enemy.isBoss) updateQuest('kill', 1, enemy.name); 
-            
-            if (enemy.isBoss) { player.bossKeys--; }
 
             let drops = rollDrops(zIndex, enemy.isBoss);
             if (drops) actionMessage += drops; else actionMessage += "<em>Nenhum item dropou.</em>";
+            
+            checkAchievements();
             checkLevelUp();
         } else {
             let defMitigation = Math.floor(getStat('defesa') * 0.2);
@@ -782,7 +1023,8 @@
         
         if (player.hp > 0 && state.trappedTime === 0) state.cooldown = 5; 
         logConsole(actionMessage.replace(/<br>/g, " ")); showPopup(actionMessage); 
-        renderZones(); updateUI();
+        
+        renderInventory(); renderZones(); updateUI();
     }
 
     function checkLevelUp() {
@@ -794,13 +1036,19 @@
         }
         if (leveledUp) { 
             calcMaxStats(); player.hp = player.maxHp; player.energy = player.maxEnergy; 
-            if (player.level === 3 || player.level === 6) { logConsole(`🗺️ Nova zona de caça desbloqueada!`); }
-            renderZones(); updateUI(); 
+            if (player.level === 5 || player.level === 10) { 
+                logConsole(`🗺️ Nova zona de caça desbloqueada! A loja foi abastecida com itens novos!`); 
+                generateShop();
+            }
+            checkAchievements(); renderZones(); updateUI(); 
         }
     }
 
-    // --- INVENTÁRIO ---
+    // --- INVENTÁRIO & ATALHOS DE POÇÃO ---
     function renderInventory() {
+        let invCountEl = document.getElementById('inv-count');
+        if(invCountEl) invCountEl.innerText = player.inventory.length;
+
         const slotsDiv = document.getElementById('equip-slots'); slotsDiv.innerHTML = '';
         const slotConfig = [
             { key: 'cabeca', label: 'Cabeça' }, { key: 'corpo', label: 'Corpo' },
@@ -830,34 +1078,56 @@
         const bagDiv = document.getElementById('inventory-list'); bagDiv.innerHTML = '';
         if (player.inventory.length === 0) { bagDiv.innerHTML = '<p>Sua mochila está vazia.</p>'; return; }
 
+        let groupedItems = [];
         player.inventory.forEach((item, index) => {
+            let key = item.type === 'equip' ? `${item.name}-${item.rarity.id}` :
+                      item.type === 'potion' ? `${item.name}` :
+                      item.type === 'key' ? `${item.name}` : `${item.name}`; 
+            
+            let existing = groupedItems.find(g => g.key === key);
+            if(existing) { existing.count++; existing.indexes.push(index); } 
+            else { groupedItems.push({ key: key, item: item, count: 1, indexes: [index] }); }
+        });
+
+        groupedItems.forEach((group) => {
+            let item = group.item;
+            let realIndex = group.indexes[0];
+            let countBadge = group.count > 1 ? `<span class="item-count">x${group.count}</span>` : '';
+
             if (item.type === 'equip') {
                 bagDiv.innerHTML += `
                 <div class="item-box border-${item.rarity.color}">
-                    <span class="${item.rarity.color}">${item.name}</span> <small class="stat-bonus">(+${item.statValue} ${item.stat.toUpperCase()})</small><br>
+                    <span class="${item.rarity.color}">${item.name}</span>${countBadge} <small class="stat-bonus">(+${item.statValue} ${item.stat.toUpperCase()})</small><br>
                     <span class="item-desc">${item.desc||''}</span>
                     <small>Venda: ${item.sellPrice} Ouro</small><br>
                     <div style="display:flex; gap:5px;">
-                        <button class="action-btn buy-btn" onclick="equipItem(${index})">Equipar</button>
-                        <button class="action-btn" onclick="sellItem(${index})">Vender</button>
+                        <button class="action-btn buy-btn" onclick="equipItem(${realIndex})">Equipar</button>
+                        <button class="action-btn" onclick="sellItem(${realIndex})">Vender</button>
                     </div>
                 </div>`;
             } else if (item.type === 'potion') {
                 bagDiv.innerHTML += `
                 <div class="item-box border-potion">
-                    <span>${item.emoji} ${item.name}</span> <small>(Restaura 50%)</small><br>
+                    <span>${item.emoji} ${item.name}</span>${countBadge} <small>(Restaura 50%)</small><br>
                     <small>Venda: ${item.sellPrice} Ouro</small><br>
                     <div style="display:flex; gap:5px;">
-                        <button class="action-btn buy-btn" style="background:#e91e63;" onclick="usePotion(${index})">Usar</button>
-                        <button class="action-btn" onclick="sellItem(${index})">Vender</button>
+                        <button class="action-btn buy-btn" style="background:#e91e63;" onclick="usePotion(${realIndex})">Usar</button>
+                        <button class="action-btn" onclick="sellItem(${realIndex})">Vender</button>
                     </div>
+                </div>`;
+            } else if (item.type === 'key') {
+                bagDiv.innerHTML += `
+                <div class="item-box border-lendario" style="background:rgba(255,215,0,0.1)">
+                    <span>${item.emoji} ${item.name}</span>${countBadge} <small>(Especial)</small><br>
+                    <span class="item-desc">${item.desc}</span>
+                    <button class="action-btn" disabled>Não vendável</button>
                 </div>`;
             } else {
                 bagDiv.innerHTML += `
                 <div class="item-box border-lixo">
-                    <span>${item.name}</span> <small>(Lixo)</small><br>
+                    <span>${item.name}</span>${countBadge} <small>(Lixo)</small><br>
                     <small>Venda: ${item.sellPrice} Ouro</small><br>
-                    <button class="action-btn buy-btn" onclick="sellItem(${index})">Vender</button>
+                    <button class="action-btn buy-btn" onclick="sellItem(${realIndex})">Vender</button>
                 </div>`;
             }
         });
@@ -868,6 +1138,11 @@
         if (pot.effect === 'hp') { player.hp = Math.min(player.maxHp, player.hp + (player.maxHp * pot.value)); logConsole(`🧪 Usou Poção de Vida.`); } 
         else { player.energy = Math.min(player.maxEnergy, player.energy + (player.maxEnergy * pot.value)); logConsole(`🧪 Usou Poção de Energia.`); }
         player.inventory.splice(index, 1); renderInventory(); updateUI();
+    }
+
+    function quickUsePotion(effect) {
+        let idx = player.inventory.findIndex(i => i.type === 'potion' && i.effect === effect);
+        if (idx !== -1) usePotion(idx);
     }
 
     function equipItem(index) {
@@ -898,6 +1173,11 @@
     function unequipSlot(slotName) {
         let eq = player.equipped[slotName];
         if (!eq) return;
+        if(player.inventory.length >= MAX_INVENTORY && !eq.isBlocked) {
+            showPopup("Sua mochila está cheia! Não é possível desequipar o item.");
+            return;
+        }
+
         if (eq.isBlocked) { unequipInternal('mao_dir'); } 
         else { unequipInternal(slotName); }
         calcMaxStats(); renderInventory(); renderZones(); updateUI();
@@ -918,6 +1198,7 @@
         if(item.type === 'trash') updateQuest('sell', 1);
         player.inventory.splice(index, 1); renderInventory(); updateUI();
     }
+    
     function sellAllTrash() {
         let earned = 0; let count = 0;
         for (let i = player.inventory.length - 1; i >= 0; i--) {
@@ -934,12 +1215,16 @@
 
         if (state.faintedTime > 0) {
             state.faintedTime--;
-            if (state.faintedTime <= 0) { player.hp = player.maxHp; player.energy = player.maxEnergy; logConsole("✨ Você acordou do desmaio!"); changed = true; }
-            if(state.faintedTime % 60 === 0) changed = true; 
+            if (state.faintedTime <= 0) { 
+                player.hp = player.maxHp; 
+                logConsole("✨ Você acordou do desmaio, mas se sente exausto!"); 
+                changed = true; 
+            }
+            if(state.faintedTime % 60 === 0 || state.faintedTime > 0) changed = true;
         } else if (state.trappedTime > 0) {
             state.trappedTime--;
             if (state.trappedTime <= 0) { logConsole("💨 Você finalmente escapou."); changed = true; }
-            if(state.trappedTime % 60 === 0) changed = true;
+            if(state.trappedTime % 60 === 0 || state.trappedTime > 0) changed = true;
         } else {
             state.hpTick++;
             if (state.hpTick >= 2) { 
@@ -954,19 +1239,28 @@
 
     function showPopup(htmlMsg) { document.getElementById('popup-text').innerHTML = htmlMsg; document.getElementById('popup-overlay').classList.remove('hidden'); }
     function closePopup(id) { document.getElementById(id).classList.add('hidden'); }
+    
     function logConsole(msg) {
         const logBox = document.getElementById('log-box'); const time = new Date().toLocaleTimeString('pt-BR');
         const entry = document.createElement('div'); entry.className = 'log-entry'; entry.innerHTML = `<em>[${time}]</em> - ${msg}`;
         logBox.prepend(entry);
     }
+    
     function showMenu(menuName) {
         document.querySelectorAll('.menu-section').forEach(el => el.classList.add('hidden'));
         document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
         document.getElementById('menu-' + menuName).classList.remove('hidden');
+        
         let btn = document.getElementById('nav-' + menuName); btn.classList.add('active');
         const nav = document.getElementById('bottom-nav');
         if (nav && btn) { const scrollLeft = btn.offsetLeft - (nav.clientWidth / 2) + (btn.clientWidth / 2); nav.scrollTo({ left: scrollLeft, behavior: 'smooth' }); }
+
+        if(menuName === 'inventario') {
+            state.hasNewItem = false;
+            updateUI();
+        }
     }
+    
     function getStatText(statName) {
         let base = player.stats[statName]; let total = getStat(statName); let bonus = total - base; let html = base;
         if (bonus > 0) html += ` <span class="stat-bonus">(+${bonus})</span>`;
@@ -1006,23 +1300,26 @@
         if (pendingQuests > 0) document.getElementById('badge-missoes').classList.remove('hidden'); else document.getElementById('badge-missoes').classList.add('hidden');
 
         document.getElementById('boss-key-progress').innerText = `${player.questsCompleted}/3`;
-        document.getElementById('boss-keys-amount').innerText = player.bossKeys;
+
+        if (state.hasNewItem) document.getElementById('badge-inventario').classList.remove('hidden');
+        else document.getElementById('badge-inventario').classList.add('hidden');
 
         let statusMsg = ""; let disableAction = false; let statusEl = document.getElementById('status-msg');
 
         if (state.faintedTime > 0) {
-            let m = Math.floor(state.faintedTime / 60); let s = state.faintedTime % 60;
-            statusMsg = `💀 Desmaiado... Clique aqui para Curar (5🪙) ou aguarde ${m}m`;
+            let m = Math.floor(state.faintedTime / 60).toString().padStart(2, '0');
+            let s = (state.faintedTime % 60).toString().padStart(2, '0');
+            statusMsg = `💀 Desmaiado... Clique para Curar HP (5🪙) ou aguarde ${m}:${s}`;
             disableAction = true; statusEl.classList.add('status-msg-clickable');
         } else if (state.trappedTime > 0) {
-            let m = Math.floor(state.trappedTime / 60); let s = state.trappedTime % 60;
-            statusMsg = `🕸️ Preso! Clique aqui para Fugir (5🪙) ou aguarde ${m}m`;
+            let m = Math.floor(state.trappedTime / 60).toString().padStart(2, '0');
+            let s = (state.trappedTime % 60).toString().padStart(2, '0');
+            statusMsg = `🕸️ Preso! Clique para Fugir (5🪙) ou aguarde ${m}:${s}`;
             disableAction = true; statusEl.classList.add('status-msg-clickable');
         } else {
             statusEl.classList.remove('status-msg-clickable');
             if (state.cooldown > 0) { statusMsg = `⏳ Descansando. Aguarde ${state.cooldown}s`; disableAction = true; } 
             else { statusMsg = "🟢 Pronto para agir."; }
-            // Checagem de energia foi movida para os botões individuais abaixo devido ao custo variável.
         }
         statusEl.innerText = statusMsg;
 
@@ -1035,14 +1332,21 @@
                 if (chanceEl) chanceEl.innerText = getChance(state.activeZoneTab, eIndex);
                 if (btnEl) {
                     if (disableAction) btnEl.disabled = true;
-                    else if (player.energy < finalEn) btnEl.disabled = true; // Blockea se não tiver energia pra este inimigo
+                    else if (player.energy < finalEn) btnEl.disabled = true; 
                     else btnEl.disabled = false;
                 }
             });
         }
 
-        shopList.forEach((si, idx) => { let btn = document.getElementById(`btn-buy-${idx}`); if (btn) btn.disabled = (player.gold < si.price); });
-        houses.forEach((house, idx) => { if (idx === 0) return; let btn = document.getElementById(`btn-house-${idx}`); if (btn && !btn.disabled) btn.disabled = (player.gold < house.price); });
+        let hpPots = player.inventory.filter(i => i.type === 'potion' && i.effect === 'hp').length;
+        let enPots = player.inventory.filter(i => i.type === 'potion' && i.effect === 'energy').length;
+        let btnHp = document.getElementById('btn-quick-hp');
+        let btnEn = document.getElementById('btn-quick-en');
+        if(btnHp) { btnHp.innerText = `❤️ Poção HP (${hpPots})`; btnHp.disabled = (hpPots === 0); }
+        if(btnEn) { btnEn.innerText = `⚡ Poção EN (${enPots})`; btnEn.disabled = (enPots === 0); }
+
+        state.shopItems.forEach((si, idx) => { let btn = document.getElementById(`btn-buy-${idx}`); if (btn && !si.bought) btn.disabled = (player.gold < si.price); });
+        houses.forEach((house, idx) => { if (idx === 0) return; let btn = document.getElementById(`btn-house-${idx}`); if (btn) btn.disabled = (player.gold < house.price); });
     }
 
     window.onload = init;
