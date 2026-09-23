@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RPG de Texto Idle</title>
+    <title>Medieval Hunter V18</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -33,7 +33,7 @@
         .status-grid {
             display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-weight: bold; align-items: center;
         }
-        .timer-text { font-size: 11px; color: #aaa; font-weight: normal; margin-left: 5px; }
+        .timer-text { font-size: 12px; color: #aaa; font-weight: normal; margin-left: 5px; }
         .info-icon { cursor: pointer; font-size: 14px; margin-left: 5px; filter: grayscale(100%); transition: 0.2s; }
         .info-icon:hover { filter: grayscale(0%); transform: scale(1.1); }
 
@@ -94,21 +94,9 @@
         .status-msg-clickable { cursor: pointer; background: rgba(255, 235, 59, 0.1); border: 1px dashed #ffeb3b; }
         .status-msg-clickable:hover { background: rgba(255, 235, 59, 0.2); }
         
-        /* Raridades */
-        .comum { color: #aaaaaa; } 
-        .incomum { color: #4caf50; } 
-        .raro { color: #2196f3; } 
-        .epico { color: #9c27b0; font-weight: bold; }
-        .lendario { color: #ffd700; font-weight: bold; text-shadow: 0 0 5px #ffd70077; }
-        
+        .comum { color: #aaaaaa; } .incomum { color: #4caf50; } .raro { color: #2196f3; } .epico { color: #9c27b0; font-weight: bold; } .lendario { color: #ffd700; font-weight: bold; text-shadow: 0 0 5px #ffd70077; }
         .item-box { border: 1px solid #444; padding: 10px; margin-bottom: 10px; background: #222; border-left-width: 5px; border-radius: 4px; }
-        .border-comum { border-left-color: #aaaaaa; } 
-        .border-incomum { border-left-color: #4caf50; }
-        .border-raro { border-left-color: #2196f3; } 
-        .border-epico { border-left-color: #9c27b0; } 
-        .border-lendario { border-left-color: #ffd700; }
-        .border-lixo { border-left-color: #555555; }
-        .border-potion { border-left-color: #e91e63; }
+        .border-comum { border-left-color: #aaaaaa; } .border-incomum { border-left-color: #4caf50; } .border-raro { border-left-color: #2196f3; } .border-epico { border-left-color: #9c27b0; } .border-lendario { border-left-color: #ffd700; } .border-lixo { border-left-color: #555555; } .border-potion { border-left-color: #e91e63; }
         
         .inv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .stat-bonus { color: #aaaaaa; font-size: 0.9em; } 
@@ -123,11 +111,17 @@
         .zone-tab.active { background: #4caf50; font-weight: bold; border-color: #4caf50; cursor: default; }
         .zone-tab.locked { opacity: 0.3; cursor: not-allowed; background: #1a1a1a; }
 
-        .shop-item, .house-item, .quest-item { display: flex; justify-content: space-between; align-items: center; background: #222; border: 1px solid #444; padding: 10px; border-radius: 4px; margin-bottom: 10px; }
-        .shop-info, .house-info, .quest-info { flex: 1; }
-        .shop-btn-container, .quest-btn-container { width: 100px; text-align: right; }
+        .shop-item, .house-item, .quest-item, .raid-item, .alert-item { display: flex; justify-content: space-between; align-items: center; background: #222; border: 1px solid #444; padding: 10px; border-radius: 4px; margin-bottom: 10px; }
+        .shop-info, .house-info, .quest-info, .raid-info, .alert-info { flex: 1; }
+        .shop-btn-container, .quest-btn-container, .raid-btn-container { width: 110px; text-align: right; }
         .active-house { border-color: #4caf50; background: #1e3320; }
         
+        .alert-item { cursor: pointer; transition: 0.2s; }
+        .alert-item:hover { background: #2a2a2a; }
+        .alert-item.unread { border-left: 4px solid #4caf50; background: #1e261e; }
+        .alert-date { font-size: 10px; color: #888; display: block; margin-bottom: 4px; }
+        .alert-msg { background: #111; padding: 10px; margin-top: 10px; border-radius: 4px; border: 1px solid #333; }
+
         progress { width: 100%; height: 10px; margin-top: 5px; accent-color: #4caf50; }
         
         .log-container { height: 350px; overflow-y: auto; padding: 10px; font-size: 13px; background: #000; border: 1px solid #444; border-radius: 4px; }
@@ -141,17 +135,21 @@
         .boss-row td { border-color: #f44336; }
         .trap-risk { font-size: 10px; color: #ff9800; display: block; margin-top: 2px;}
 
-        /* Tabs internas genéricas */
         .abas-internas { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
         .aba-interna-btn { flex: 1; padding: 10px; background: #333; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; min-width: 60px;}
         .aba-interna-btn.active { background: #4caf50; }
 
         .wiki-content { font-size: 13px; line-height: 1.6; }
-        .wiki-content h4 { color: #4caf50; margin-bottom: 5px; border-bottom: 1px solid #444; padding-bottom: 5px; }
+        .wiki-content h4 { color: #4caf50; margin-bottom: 5px; border-bottom: 1px solid #444; padding-bottom: 5px; margin-top: 20px; }
         .wiki-content table { font-size: 12px; }
         .wiki-content th, .wiki-content td { padding: 5px; text-align: center; }
 
         .quick-potions-container { display:flex; gap:10px; margin-bottom:15px; background: #222; padding: 10px; border: 1px solid #444; border-radius: 4px; }
+        
+        .raid-active-container { background: #1e3320; border: 1px solid #4caf50; padding: 20px; border-radius: 8px; text-align: center; }
+        .raid-timer { font-size: 24px; font-weight: bold; color: #4caf50; margin: 15px 0; }
+        
+        .coord-box { background: #222; border: 1px dashed #555; padding: 10px; text-align: center; border-radius: 4px; margin-bottom: 15px;}
     </style>
 </head>
 <body>
@@ -183,7 +181,6 @@
             <button class="aba-interna-btn" id="btn-tab-conquistas" onclick="switchPersonagemTab('conquistas')">🏆 Conquistas</button>
         </div>
 
-        <!-- ABA ATRIBUTOS -->
         <div id="personagem-atributos">
             <div id="unspent-alert" class="hidden">Você tem <span id="stat-points">0</span> pontos para distribuir!</div>
             <table>
@@ -194,7 +191,6 @@
             </table>
         </div>
 
-        <!-- ABA CONQUISTAS -->
         <div id="personagem-conquistas" class="hidden">
             <p>Complete objetivos para desbloquear estas marcas em sua jornada.</p>
             <div id="achievements-list"></div>
@@ -225,82 +221,102 @@
     <div id="menu-missoes" class="menu-section hidden">
         <h3>Mural de Recompensas</h3>
         <p>Conclua objetivos para ganhar moedas.<br>Progresso da Próxima Chave: <strong id="boss-key-progress">0/3</strong> 🔑</p>
-        <p><small><em>As Chaves do Chefe são enviadas para a sua mochila (se houver espaço).</em></small></p>
         <div id="quest-list"></div>
     </div>
     
     <!-- 5. MENU LOJA -->
     <div id="menu-loja" class="menu-section hidden">
         <h3>Mercado da Cidade</h3>
-        <p>Compre itens e poções. <small>(Estoque totalmente renovado a cada zona desbloqueada).</small><br>Ouro Atual: <strong id="shop-gold">0</strong>🪙</p>
+        <p>Ouro Atual: <strong id="shop-gold">0</strong>🪙</p>
         <div id="loja-list"></div>
     </div>
 
     <!-- 6. MENU CASA -->
     <div id="menu-casa" class="menu-section hidden">
         <h3>Agência Imobiliária</h3>
-        <p>Melhore sua residência para aumentar a recuperação a cada ciclo (Tick).</p>
+        <div class="coord-box">
+            <p style="margin:0; font-size: 13px; color:#aaa;">📍 Localização da sua Base (QG)<br><strong>[X: <span id="coord-x" style="color:#fff"></span> | Y: <span id="coord-y" style="color:#fff"></span>]</strong></p>
+        </div>
         <div id="house-list"></div>
     </div>
 
-    <!-- 7. MENU AJUSTES -->
+    <!-- 7. MENU RAID -->
+    <div id="menu-raid" class="menu-section hidden">
+        <h3>Expedições e Invasões</h3>
+        <p>Envie um destacamento para saquear locais próximos. Viagens levam tempo para ir e voltar. <strong>Ações na base ficarão bloqueadas.</strong></p>
+        <div id="raid-content"></div>
+    </div>
+
+    <!-- 8. MENU RELATÓRIOS -->
+    <div id="menu-relatorios" class="menu-section hidden">
+        <h3>Caixa de Entrada <button class="action-btn buy-btn" style="float:right; width:auto;" onclick="markAllAlertsRead()">Marcar Lidos</button></h3>
+        <p><small>Clique sobre os relatórios para expandir as informações.</small></p>
+        <div id="alerts-list"></div>
+    </div>
+
+    <!-- 9. MENU AJUSTES -->
     <div id="menu-ajustes" class="menu-section hidden">
         <div class="abas-internas">
             <button class="aba-interna-btn active" id="btn-tab-log" onclick="switchAjustesTab('log')">📜 Log</button>
             <button class="aba-interna-btn" id="btn-tab-wiki" onclick="switchAjustesTab('wiki')">📖 Wiki</button>
             <button class="aba-interna-btn" id="btn-tab-codex" onclick="switchAjustesTab('codex')">🗂️ Codex</button>
+            <button class="aba-interna-btn" id="btn-tab-notas" onclick="switchAjustesTab('notas')">📋 Notas</button>
             <button class="aba-interna-btn" id="btn-tab-dados" onclick="switchAjustesTab('dados')">💾 Dados</button>
         </div>
         
-        <!-- SUBMENU LOG -->
         <div id="ajustes-log">
             <h3>Histórico de Ações</h3>
             <div class="log-container" id="log-box"></div>
         </div>
 
-        <!-- SUBMENU WIKI -->
         <div id="ajustes-wiki" class="hidden wiki-content">
-            <h3>Enciclopédia do Jogo (Versão 16)</h3>
+            <h3>Enciclopédia Completa</h3>
             
-            <h4>1. Limite da Mochila</h4>
-            <p>Sua mochila pode carregar apenas <strong>8 itens</strong> simultaneamente. Se não houver espaço, novos itens de chefes ou inimigos serão irremediavelmente perdidos.</p>
+            <h4>Mecânica de Combate</h4>
+            <p><strong>Chance de Acerto (%) =</strong> Chance Base do Inimigo + (Sua Força * 2.5) + (Sua Defesa * 0.5) - Modificadores de Armas. O acerto máximo é travado em 95%.</p>
 
-            <h4>2. Taxas de Drop de Equipamentos</h4>
-            <p>Um inimigo só pode dropar <strong>no máximo 1 item</strong> por vitória, seja equipamento, poção ou lixo. Os Chefes dropam 1 item Lendário garantido.</p>
+            <h4>Prisão e Custos</h4>
+            <p>Se você errar o ataque e sofrer dano, há chance de prisão.<br>
+            <strong>Custo de Resgate (Ouro) =</strong> (Nível da Zona * 100) + (Valor de Venda da Mochila * 0.8).<br>
+            Você pode aguardar o tempo ou pagar o resgate instantâneo.</p>
+
+            <h4>Drops em Batalhas Normais</h4>
+            <p>A taxa de itens varia de acordo com a área em que está caçando. Você só dropa 1 item por vitória.</p>
             <table>
-                <tr>
-                    <th>Área</th>
-                    <th class="comum">Cinza</th>
-                    <th class="incomum">Verde</th>
-                    <th class="raro">Azul</th>
-                    <th class="epico">Roxo</th>
-                    <th class="lendario">Dour.</th>
-                </tr>
-                <tr><td>Floresta (Nv 1)</td><td>70%</td><td>24.5%</td><td>5%</td><td>0.4%</td><td>0.1%</td></tr>
-                <tr><td>Montanhas (Nv 5)</td><td>50%</td><td>30%</td><td>15%</td><td>4%</td><td>1%</td></tr>
-                <tr><td>Inferno (Nv 10)</td><td>30%</td><td>35%</td><td>22%</td><td>10%</td><td>3%</td></tr>
+                <tr><th>Área</th><th class="comum">Cinza</th><th class="incomum">Verde</th><th class="raro">Azul</th><th class="epico">Roxo</th><th class="lendario">Dourado</th></tr>
+                <tr><td>Floresta</td><td>70%</td><td>24.5%</td><td>5%</td><td>0.4%</td><td>0.1%</td></tr>
+                <tr><td>Montanhas</td><td>50%</td><td>30%</td><td>15%</td><td>4%</td><td>1%</td></tr>
+                <tr><td>Inferno</td><td>30%</td><td>35%</td><td>22%</td><td>10%</td><td>3%</td></tr>
             </table>
 
-            <h4>3. Combate, Acerto e Fuga</h4>
-            <p><strong>Cálculo de Acerto:</strong> O limite máximo de sucesso absoluto é travado em <strong>95%</strong>, não importa sua força.</p>
-            <p><strong>Fuga e Prisão:</strong> Caso erre o ataque e receba dano, há o risco de ficar <strong>Preso</strong>. A chance base é de 10%, aumentando em 5% por cada Zona mais avançada e 2% pela dificuldade (ordem) do inimigo na lista. Sua Saúde <strong>reduz</strong> ativamente esse risco em 0.5% por ponto total.</p>
-
-            <h4>4. Desmaio, Prisão e Custos</h4>
-            <p>Seja desmaiado ou preso, sua <strong>Energia e HP continuarão regenerando normalmente</strong>. A punição o impede de agir por 30 minutos ou até você pagar a fiança/resgate instantâneo. <br><br>
-            <strong>Custo do Resgate:</strong> É dinâmico e atrelado ao seu poder e localização.<br> 
-            Fórmula: <code>(Nível da Zona * 100) + (Valor de Venda da Mochila * 0.8)</code>.<br>
-            <em>Nota: Pagar o resgate não cura o HP ou Energia instantaneamente, ele apenas te liberta da penalidade de tempo.</em></p>
+            <h4>Qualidade de Itens na Loja</h4>
+            <p>A loja atualiza seu estoque a cada nova zona liberada. Com o tempo, melhores itens aparecem para venda.</p>
+            <table>
+                <tr><th>Área Atual</th><th class="comum">Cinza</th><th class="incomum">Verde</th><th class="raro">Azul</th><th class="epico">Roxo</th><th class="lendario">Dourado</th></tr>
+                <tr><td>Floresta (Nv 1)</td><td>70%</td><td>30%</td><td>0%</td><td>0%</td><td>0%</td></tr>
+                <tr><td>Montanhas (Nv 5)</td><td>40%</td><td>40%</td><td>20%</td><td>0%</td><td>0%</td></tr>
+                <tr><td>Inferno (Nv 10)</td><td>10%</td><td>30%</td><td>40%</td><td>20%</td><td>0%</td></tr>
+            </table>
         </div>
 
-        <!-- SUBMENU CODEX -->
-        <div id="ajustes-codex" class="hidden wiki-content">
-            <!-- Gerado dinamicamente via JS -->
+        <div id="ajustes-codex" class="hidden wiki-content"></div>
+
+        <div id="ajustes-notas" class="hidden wiki-content">
+            <h3>Notas de Atualização</h3>
+            <h4>Versão 18</h4>
+            <ul>
+                <li><strong>Info de Regeneração:</strong> Popups de HP e EN agora mostram a velocidade de tempo cravado e o timer de preenchimento.</li>
+                <li><strong>Revisão da Wiki:</strong> Inclusão das tabelas completas de Lojas e fórmulas transparentes do jogo.</li>
+                <li><strong>Codex Expandido:</strong> Atributos secundários e bônus exibidos com clareza na tabela.</li>
+                <li><strong>Moradias:</strong> Reformulamos a exibição: agora você vê exatamente o quanto elas <em>adicionam</em> em valores inteiros sobre a taxa base (Rua).</li>
+                <li><strong>Raid Reformulado:</strong> Novo ícone (⚔️) e introdução de Custo de Energia nas viagens.</li>
+                <li><strong>Relatórios:</strong> Novo sistema de Caixa de Entrada (mensagens expandem ao clicar) para organizar alertas.</li>
+                <li><strong>Localização Física:</strong> O jogador agora possui coordenadas (X;Y) definitivas visíveis na aba Casa para os futuros sistemas de viagem.</li>
+            </ul>
         </div>
 
-        <!-- SUBMENU DADOS -->
         <div id="ajustes-dados" class="hidden wiki-content">
             <h3>Gerenciamento de Save</h3>
-            <p>O jogo salva automaticamente o seu progresso a cada 10 segundos.</p>
             <button class="action-btn buy-btn" onclick="saveGame(true)" style="padding:15px; margin-bottom:10px; background:#2196f3; font-weight:bold;">💾 Forçar Salvamento Manual</button>
             <button class="action-btn" onclick="resetGame()" style="padding:15px; background:#f44336; font-weight:bold; color:white;">🗑️ Apagar Progresso (Resetar Tudo)</button>
         </div>
@@ -321,11 +337,17 @@
         <button class="nav-btn" id="nav-missoes" onclick="showMenu('missoes')">
             📋<span id="badge-missoes" class="badge hidden">!</span><span class="label">Missões</span>
         </button>
+        <button class="nav-btn" id="nav-raid" onclick="showMenu('raid')">
+            ⚔️<span class="label">Raid</span>
+        </button>
         <button class="nav-btn" id="nav-loja" onclick="showMenu('loja')">
             💰<span class="label">Loja</span>
         </button>
         <button class="nav-btn" id="nav-casa" onclick="showMenu('casa')">
             🏠<span class="label">Casa</span>
+        </button>
+        <button class="nav-btn" id="nav-relatorios" onclick="showMenu('relatorios')">
+            📑<span id="badge-alertas" class="badge hidden">!</span><span class="label">Relatórios</span>
         </button>
         <button class="nav-btn" id="nav-ajustes" onclick="showMenu('ajustes')">
             ⚙️<span class="label">Ajustes</span>
@@ -333,7 +355,7 @@
     </div>
 </div>
 
-<!-- POPUP AÇÕES COMUNS -->
+<!-- POPUPS -->
 <div id="popup-overlay" class="hidden popup-overlay">
     <div class="popup-box">
         <div class="popup-text" id="popup-text"></div>
@@ -341,7 +363,6 @@
     </div>
 </div>
 
-<!-- POPUP DESMAIADO / PRESO -->
 <div id="revive-overlay" class="hidden popup-overlay">
     <div class="popup-box">
         <h3 style="margin-top:0; color:#f44336;" id="revive-title">💀 Status Crítico!</h3>
@@ -354,10 +375,9 @@
 </div>
 
 <script>
-    // --- CONSTANTES ---
     const MAX_INVENTORY = 8;
+    const PENALTY_TIMES = [300, 900, 1800]; // 5m, 15m, 30m
 
-    // --- ESTADO DO JOGO ---
     let player = {
         level: 1, exp: 0, expNext: 100, gold: 5,
         hp: 100, maxHp: 100, energy: 50, maxEnergy: 50,
@@ -366,22 +386,24 @@
         equipped: { cabeca: null, corpo: null, mao_esq: null, mao_dir: null, pes: null },
         houseIndex: 0, questsCompleted: 0,
         statsData: { enemiesKilled: 0 },
-        achievements: []
+        achievements: [], alerts: [],
+        baseCoords: null // Criado no INIT
     };
 
     let state = { 
         cooldown: 0, faintedTime: 0, trappedTime: 0, activeZoneTab: 0, hpTick: 0, shopItems: [],
-        hasNewItem: false, penaltyCost: 0
+        hasNewItem: false, penaltyCost: 0,
+        raid: { active: false, phase: null, targetId: null, timeTotal: 0, timeLeft: 0, lootGold: 0 }
     };
     let activeQuests = [];
 
     // --- BANCOS DE DADOS ---
     const houses = [
-        { name: 'Nenhuma (Rua)', emoji: '🛤️', hpRegen: 0.005, enRegen: 0.2, price: 0, desc: '+0.5% HP (2s) | +0.2 EN/s' },
-        { name: 'Cabana', emoji: '🏕️', hpRegen: 0.010, enRegen: 0.4, price: 200, desc: '+1.0% HP (2s) | +0.4 EN/s' },
-        { name: 'Casa', emoji: '🏠', hpRegen: 0.015, enRegen: 0.6, price: 800, desc: '+1.5% HP (2s) | +0.6 EN/s' },
-        { name: 'Forte', emoji: '🏰', hpRegen: 0.020, enRegen: 1.0, price: 3000, desc: '+2.0% HP (2s) | +1.0 EN/s' },
-        { name: 'Castelo', emoji: '👑', hpRegen: 0.035, enRegen: 2.0, price: 10000, desc: '+3.5% HP (2s) | +2.0 EN/s' }
+        { name: 'Nenhuma (Rua)', emoji: '🛤️', hpRegen: 0.005, enRegen: 0.2, price: 0, desc: 'Base: 1 de Energia a cada 00:05 | 0.5% da Saúde a cada 00:02' },
+        { name: 'Cabana', emoji: '🏕️', hpRegen: 0.010, enRegen: 0.4, price: 200, desc: 'Adiciona: +1 de Energia a cada 00:05 | +0.5% de Saúde a cada 00:02' },
+        { name: 'Casa', emoji: '🏠', hpRegen: 0.015, enRegen: 0.6, price: 800, desc: 'Adiciona: +2 de Energia a cada 00:05 | +1.0% de Saúde a cada 00:02' },
+        { name: 'Forte', emoji: '🏰', hpRegen: 0.020, enRegen: 1.0, price: 3000, desc: 'Adiciona: +4 de Energia a cada 00:05 | +1.5% de Saúde a cada 00:02' },
+        { name: 'Castelo', emoji: '👑', hpRegen: 0.035, enRegen: 2.0, price: 10000, desc: 'Adiciona: +9 de Energia a cada 00:05 | +3.0% de Saúde a cada 00:02' }
     ];
 
     const equipTypes = [
@@ -389,9 +411,9 @@
         { name: 'Espada Longa', slot: 'hand', hands: 2, stat: 'forca', baseVal: 4, desc: 'Dano alto (2 Mãos)' },
         { name: 'Machado Curto', slot: 'hand', hands: 1, stat: 'forca', baseVal: 3, desc: 'Dano moderado (1 Mão)' },
         { name: 'Machado de Batalha', slot: 'hand', hands: 2, stat: 'forca', baseVal: 5, desc: 'Dano massivo (2 Mãos)' },
-        { name: 'Adaga', slot: 'hand', hands: 1, stat: 'forca', baseVal: 1, special: 'adaga', desc: '-4 Custo EN | -10% Acerto (1 Mão)' },
-        { name: 'Arco', slot: 'hand', hands: 2, stat: 'forca', baseVal: 3, special: 'arco', desc: 'Reduz chance de Prisão (2 Mãos)' },
-        { name: 'Cajado de Cura', slot: 'hand', hands: 2, stat: 'forca', baseVal: 2, special: 'cajado', desc: '-30% Dano recebido (2 Mãos)' },
+        { name: 'Adaga', slot: 'hand', hands: 1, stat: 'forca', baseVal: 1, special: 'adaga', desc: 'Bônus: -4 Custo EN | Debuff: -10% Acerto (1 Mão)' },
+        { name: 'Arco', slot: 'hand', hands: 2, stat: 'forca', baseVal: 3, special: 'arco', desc: 'Bônus: Reduz chance de Prisão (2 Mãos)' },
+        { name: 'Cajado de Cura', slot: 'hand', hands: 2, stat: 'forca', baseVal: 2, special: 'cajado', desc: 'Bônus: -30% Dano recebido (2 Mãos)' },
         { name: 'Escudo', slot: 'hand', hands: 1, stat: 'defesa', baseVal: 2, desc: 'Proteção extra (1 Mão)' },
         { name: 'Armadura de Couro', slot: 'corpo', hands: 0, stat: 'defesa', baseVal: 2, desc: 'Proteção leve' },
         { name: 'Armadura de Placas', slot: 'corpo', hands: 0, stat: 'defesa', baseVal: 4, desc: 'Proteção pesada' },
@@ -411,17 +433,8 @@
         { id: 'lendario', name: 'Lendário', color: 'lendario', mult: 8 }
     ];
 
-    const dropRates = [
-        [70.0, 24.5, 5.0, 0.4, 0.1], // Floresta
-        [50.0, 30.0, 15.0, 4.0, 1.0], // Montanhas
-        [30.0, 35.0, 22.0, 10.0, 3.0] // Inferno
-    ];
-    
-    const shopRarityRates = [
-        [70.0, 30.0, 0, 0, 0],   // Z0: Floresta
-        [40.0, 40.0, 20.0, 0, 0],  // Z1: Montanhas
-        [10.0, 30.0, 40.0, 20.0, 0]  // Z2: Inferno
-    ];
+    const dropRates = [[70.0, 24.5, 5.0, 0.4, 0.1], [50.0, 30.0, 15.0, 4.0, 1.0], [30.0, 35.0, 22.0, 10.0, 3.0]];
+    const shopRarityRates = [[70.0, 30.0, 0, 0, 0], [40.0, 40.0, 20.0, 0, 0], [10.0, 30.0, 40.0, 20.0, 0]];
 
     const zones = [
         { name: 'Floresta', emoji: '🌲', reqLevel: 1, enemies: [
@@ -445,186 +458,125 @@
     ];
 
     const trashItems = ['Dente Quebrado', 'Pedaço de Pano', 'Pele Rasgada', 'Garra Suja', 'Osso Rachado'];
-    
     const achievementsDb = [
         { id: 'cacador', name: 'Caçador', desc: 'Derrote 30 inimigos.', diff: 'Fácil' },
         { id: 'explorador', name: 'Explorador', desc: 'Desbloqueie todas as zonas.', diff: 'Médio' },
         { id: 'rei', name: 'Rei', desc: 'Obtenha um Castelo.', diff: 'Difícil' }
     ];
 
-    // --- SALVAMENTO E CARREGAMENTO ---
+    const raidTargets = [
+        { id: 't1', name: 'Acampamento Bandido', emoji: '🏕️', travelTime: 120, diff: 20, goldBase: 200, energy: 20 },
+        { id: 't2', name: 'Ruínas Esquecidas', emoji: '🗼', travelTime: 420, diff: 60, goldBase: 800, energy: 45 },
+        { id: 't3', name: 'Forte Obscuro', emoji: '🏰', travelTime: 900, diff: 120, goldBase: 2500, energy: 80 }
+    ];
+
     function saveGame(manual = false) {
         let saveObj = { player: player, state: state, activeQuests: activeQuests };
-        localStorage.setItem('mh_save_v16', JSON.stringify(saveObj));
-        if(manual) { logConsole("💾 Progresso salvo manualmente!"); showPopup("Progresso salvo com sucesso!"); }
+        localStorage.setItem('mh_save_v18', JSON.stringify(saveObj));
+        if(manual) { logConsole("💾 Progresso salvo!"); showPopup("Progresso salvo com sucesso!"); }
     }
 
     function loadGame() {
-        let saved = localStorage.getItem('mh_save_v16') || localStorage.getItem('mh_save_v15') || localStorage.getItem('mh_save_v14') || localStorage.getItem('mh_save_v13') || localStorage.getItem('mh_save_v12');
+        let saved = localStorage.getItem('mh_save_v18') || localStorage.getItem('mh_save_v17');
         if (saved) {
             let parsed = JSON.parse(saved);
             player = {...player, ...parsed.player};
             state = {...state, ...parsed.state};
             activeQuests = parsed.activeQuests || [];
-            
-            if(!player.statsData) player.statsData = { enemiesKilled: 0 };
-            if(!player.achievements) player.achievements = [];
-            if(state.hasNewItem === undefined) state.hasNewItem = false;
-            if(state.penaltyCost === undefined && (state.faintedTime > 0 || state.trappedTime > 0)) state.penaltyCost = 5; // Compatibilidade retroativa
-            
-            if(player.bossKeys !== undefined && player.bossKeys > 0) {
-                for(let i=0; i<player.bossKeys; i++) grantBossKey();
-                delete player.bossKeys;
-            }
-
-            logConsole("💾 Progresso carregado com sucesso!");
+            if(!player.alerts) player.alerts = [];
+            if(!state.raid) state.raid = { active: false, phase: null, targetId: null, timeTotal: 0, timeLeft: 0, lootGold: 0 };
             return true;
         }
         return false;
     }
 
     function resetGame() {
-        if(confirm("ATENÇÃO: Você tem certeza que deseja apagar todo o seu progresso? Isso não poderá ser desfeito.")) {
-            localStorage.removeItem('mh_save_v16');
-            localStorage.removeItem('mh_save_v15');
-            localStorage.removeItem('mh_save_v14');
-            localStorage.removeItem('mh_save_v13');
-            localStorage.removeItem('mh_save_v12');
-            location.reload();
+        if(confirm("Deseja apagar todo o seu progresso? Isso não poderá ser desfeito.")) {
+            localStorage.removeItem('mh_save_v18'); localStorage.removeItem('mh_save_v17'); location.reload();
         }
     }
 
-    // --- INICIALIZAÇÃO ---
     function init() {
         let isLoaded = loadGame();
         calcMaxStats();
+        if (!player.baseCoords) player.baseCoords = { x: Math.floor(Math.random() * 100) + 1, y: Math.floor(Math.random() * 100) + 1 };
         
-        if (!isLoaded) {
-            player.hp = player.maxHp; 
-            player.energy = player.maxEnergy;
-            logConsole("Bem-vindo ao mundo! O jogo começou.");
-        }
-        
+        if (!isLoaded) { player.hp = player.maxHp; player.energy = player.maxEnergy; logConsole("Bem-vindo ao mundo!"); }
         while(activeQuests.length < 3) activeQuests.push(generateUniqueQuest());
         if(!state.shopItems || state.shopItems.length === 0) generateShop();
         
-        renderCodex();
-        renderZones(); renderInventory(); renderLoja(); renderCasa(); renderMissoes(); renderAchievements(); updateUI();
+        document.getElementById('coord-x').innerText = player.baseCoords.x;
+        document.getElementById('coord-y').innerText = player.baseCoords.y;
         
+        renderCodex(); renderZones(); renderInventory(); renderLoja(); renderCasa(); renderMissoes(); renderAchievements(); renderRaid(); renderAlertas(); updateUI();
         setInterval(gameLoop, 1000); 
-        setInterval(saveGame, 10000); // Salva a cada 10 segundos
+        setInterval(saveGame, 10000); 
     }
 
-    // --- INTERAÇÕES INFO UI ---
+    function formatTimeStr(sec) {
+        if (sec <= 0 || isNaN(sec) || !isFinite(sec)) return "00:00";
+        let m = Math.floor(sec / 60).toString().padStart(2, '0');
+        let s = Math.floor(sec % 60).toString().padStart(2, '0');
+        return `${m}:${s}`;
+    }
+
     function showInfo(type) {
         let currentHouse = houses[player.houseIndex];
         if (type === 'hp') {
             let regenPerSec = (player.maxHp * currentHouse.hpRegen) / 2;
+            let timeForOne = Math.ceil(1 / regenPerSec);
             let missing = player.maxHp - player.hp;
-            let timeSec = missing > 0 ? Math.ceil(missing / regenPerSec) : 0;
-            let m = Math.floor(timeSec / 60); let s = timeSec % 60;
-            showPopup(`<strong>❤️ Recuperação de HP</strong><br><br>Sua casa atual (${currentHouse.name}) garante uma recuperação de:<br><strong>${regenPerSec.toFixed(1)} HP por segundo.</strong><br><br>Tempo para HP completo: <strong>${m}m ${s}s</strong>`);
+            let timeFull = missing > 0 ? Math.ceil(missing / regenPerSec) : 0;
+            showPopup(`<strong>❤️ Recuperação de HP</strong><br><br>Taxa de velocidade:<br><strong>1 de HP em ${formatTimeStr(timeForOne)}</strong><br><br>HP completo em:<br><strong>${formatTimeStr(timeFull)}</strong>`);
         } else {
             let regenPerSec = currentHouse.enRegen;
+            let timeForOne = Math.ceil(1 / regenPerSec);
             let missing = player.maxEnergy - player.energy;
-            let timeSec = missing > 0 ? Math.ceil(missing / regenPerSec) : 0;
-            let m = Math.floor(timeSec / 60); let s = timeSec % 60;
-            showPopup(`<strong>⚡ Recuperação de Energia</strong><br><br>Sua casa atual (${currentHouse.name}) garante uma recuperação de:<br><strong>${regenPerSec.toFixed(1)} EN por segundo.</strong><br><br>Tempo para EN completa: <strong>${m}m ${s}s</strong>`);
+            let timeFull = missing > 0 ? Math.ceil(missing / regenPerSec) : 0;
+            showPopup(`<strong>⚡ Recuperação de Energia</strong><br><br>Taxa de velocidade:<br><strong>1 de Energia em ${formatTimeStr(timeForOne)}</strong><br><br>Energia completa em:<br><strong>${formatTimeStr(timeFull)}</strong>`);
         }
     }
 
     function renderCodex() {
-        const codexDiv = document.getElementById('ajustes-codex');
-        let html = `<h3>Codex de Itens</h3>`;
-        html += `<h4>Equipamentos Base</h4><table><tr><th>Nome</th><th>Tipo</th><th>Efeito Base</th></tr>`;
+        let html = `<h3>Codex Completo</h3><table><tr><th>Equipamento</th><th>Atributos e Efeitos</th></tr>`;
         equipTypes.forEach(e => {
-            let effect = e.stat === 'forca' ? `+${e.baseVal} FOR` : e.stat === 'defesa' ? `+${e.baseVal} DEF` : `+${e.baseVal} INT`;
-            html += `<tr><td>${e.name}</td><td>${e.slot.toUpperCase()}</td><td>${effect} <br><small>${e.desc}</small></td></tr>`;
+            let statText = `+${e.baseVal} ${e.stat.toUpperCase()}`;
+            html += `<tr>
+                <td><strong>${e.name}</strong><br><small>${e.slot.toUpperCase()}</small></td>
+                <td><span style="color:#4caf50; font-weight:bold;">${statText}</span><br><span style="color:#ffeb3b; font-size:11px;">${e.desc}</span></td>
+            </tr>`;
         });
-        html += `</table><h4>Raridades (Multiplicadores)</h4><ul>`;
-        rarities.forEach(r => { html += `<li><span class="${r.color}">${r.name}</span>: x${r.mult} no Atributo Base</li>`; });
-        html += `</ul><h4>Consumíveis / Especiais</h4><ul>
-        <li>❤️ Poção de Vida: Restaura 50% do HP Máx</li>
-        <li>⚡ Poção de Energia: Restaura 50% da EN Máx</li>
-        <li>🔑 Chave do Chefe: Permite o acesso a um confronto com um Chefe. Consumida no uso.</li>
-        </ul>`;
-        codexDiv.innerHTML = html;
+        html += `</table>`; 
+        document.getElementById('ajustes-codex').innerHTML = html;
     }
 
-    // --- CÁLCULOS COMBATE E STATUS ---
-    function getHighestZoneIndex() {
-        let maxIdx = 0;
-        for(let i=0; i<zones.length; i++) {
-            if(player.level >= zones[i].reqLevel) maxIdx = i;
-        }
-        return maxIdx;
+    function getHighestZoneIndex() { let maxIdx = 0; for(let i=0; i<zones.length; i++) { if(player.level >= zones[i].reqLevel) maxIdx = i; } return maxIdx; }
+    function getStat(statName) { let t = player.stats[statName]; for (let k in player.equipped) { let eq = player.equipped[k]; if (eq && !eq.isBlocked && eq.stat === statName) t += eq.statValue; } return t; }
+    function calcMaxStats() { player.maxHp = getStat('saude') * 10; player.maxEnergy = getStat('inteligencia') * 10; }
+    function getCombatModifiers() { let eD = player.equipped.mao_dir; let eE = player.equipped.mao_esq; return { hasAdaga: (eD?.special === 'adaga' || eE?.special === 'adaga'), hasArco: (eD?.special === 'arco'), hasCajado: (eD?.special === 'cajado') }; }
+    function getFinalEnergyCost(b) { let m = getCombatModifiers(); return m.hasAdaga ? Math.max(1, b - 4) : b; }
+    
+    function getChance(z, e) { let en = zones[z].enemies[e]; let m = getCombatModifiers(); let c = en.baseChance + (getStat('forca') * 2.5) + (getStat('defesa') * 0.5); if(m.hasAdaga) c -= 10; return Math.floor(Math.max(5, Math.min(95, c))); }
+    function getTrapChance(z, e) { let c = 10 + (z * 5) + (e * 2) - Math.floor(getStat('saude') * 0.5); if (getCombatModifiers().hasArco) c -= 5; return Math.max(2, Math.min(90, c)); }
+    function addStat(s) { if (player.statPoints > 0) { player.stats[s]++; player.statPoints--; calcMaxStats(); updateUI(); } }
+    function calculatePenalty(z) { return Math.floor(((z + 1) * 100) + (player.inventory.reduce((s, i) => s + (i.sellPrice || 0), 0) * 0.8)); }
+
+    function addAlert(title, message) {
+        player.alerts.unshift({ id: Date.now(), date: new Date().toLocaleTimeString('pt-BR'), title: title, msg: message, read: false });
+        if (player.alerts.length > 30) player.alerts.pop();
+        renderAlertas(); updateUI();
     }
 
-    function getStat(statName) {
-        let total = player.stats[statName];
-        for (let key in player.equipped) {
-            let eq = player.equipped[key];
-            if (eq && !eq.isBlocked && eq.stat === statName) total += eq.statValue;
-        }
-        return total;
-    }
-
-    function calcMaxStats() {
-        player.maxHp = getStat('saude') * 10;
-        player.maxEnergy = getStat('inteligencia') * 10;
-    }
-
-    function getCombatModifiers() {
-        let eD = player.equipped.mao_dir; let eE = player.equipped.mao_esq;
-        let hasAdaga = (eD?.special === 'adaga' || eE?.special === 'adaga');
-        let hasArco = (eD?.special === 'arco');
-        let hasCajado = (eD?.special === 'cajado');
-        return { hasAdaga, hasArco, hasCajado };
-    }
-
-    function getFinalEnergyCost(baseCost) {
-        let mods = getCombatModifiers();
-        return mods.hasAdaga ? Math.max(1, baseCost - 4) : baseCost;
-    }
-
-    function getChance(zIndex, eIndex) {
-        let enemy = zones[zIndex].enemies[eIndex];
-        let mods = getCombatModifiers();
-        let chance = enemy.baseChance + (getStat('forca') * 2.5) + (getStat('defesa') * 0.5);
-        if(mods.hasAdaga) chance -= 10;
-        return Math.floor(Math.max(5, Math.min(95, chance)));
-    }
-
-    function getTrapChance(zIndex, eIndex) {
-        let mods = getCombatModifiers();
-        // Base 10 + (Z*5) + (E*2) - (Saúde*0.5)
-        let chance = 10 + (zIndex * 5) + (eIndex * 2) - Math.floor(getStat('saude') * 0.5);
-        if (mods.hasArco) chance -= 5;
-        return Math.max(2, Math.min(90, chance)); // clamp entre 2% e 90%
-    }
-
-    function addStat(statName) {
-        if (player.statPoints > 0) {
-            player.stats[statName]++; player.statPoints--; calcMaxStats(); updateUI();
-        }
-    }
-
-    function calculatePenalty(zIndex) {
-        let invValue = player.inventory.reduce((sum, item) => sum + (item.sellPrice || 0), 0);
-        return Math.floor(((zIndex + 1) * 100) + (invValue * 0.8));
-    }
-
-    // --- INTERAÇÕES DE ESTADO (DESMAIO / PRESO) ---
     function handleStatusClick() {
         if(state.faintedTime > 0) {
             document.getElementById('revive-title').innerText = "💀 Desmaiado!";
-            document.getElementById('revive-desc').innerHTML = `Você está incapacitado de agir, mas seu corpo continua regenerando <strong>HP e EN normalmente</strong> ao longo do tempo.<br><br>Deseja pagar <strong>${state.penaltyCost} Ouro</strong> para despertar instantaneamente (sem curar)?`;
+            document.getElementById('revive-desc').innerHTML = `Seu corpo continua regenerando. Deseja pagar <strong>${state.penaltyCost} Ouro</strong> para despertar?`;
             document.getElementById('btn-revive-pay').innerText = `Pagar ${state.penaltyCost} 🪙`;
             document.getElementById('btn-revive-pay').disabled = (player.gold < state.penaltyCost);
             document.getElementById('revive-overlay').classList.remove('hidden');
         } else if (state.trappedTime > 0) {
             document.getElementById('revive-title').innerText = "🕸️ Preso na Fuga!";
-            document.getElementById('revive-desc').innerHTML = `Você está encurralado! Seu corpo continua regenerando <strong>HP e EN normalmente</strong> enquanto escondido.<br><br>Deseja subornar e pagar <strong>${state.penaltyCost} Ouro</strong> para escapar instantaneamente?`;
+            document.getElementById('revive-desc').innerHTML = `Seu corpo regenera escondido. Deseja subornar por <strong>${state.penaltyCost} Ouro</strong> para escapar?`;
             document.getElementById('btn-revive-pay').innerText = `Pagar ${state.penaltyCost} 🪙`;
             document.getElementById('btn-revive-pay').disabled = (player.gold < state.penaltyCost);
             document.getElementById('revive-overlay').classList.remove('hidden');
@@ -634,676 +586,382 @@
     function revive(pay) {
         if(pay && player.gold >= state.penaltyCost) {
             player.gold -= state.penaltyCost;
-            if(state.faintedTime > 0) {
-                logConsole(`✨ Você pagou ${state.penaltyCost} Ouro aos clérigos locais e despertou imediatamente.`);
-            } else {
-                logConsole(`💨 Você usou ${state.penaltyCost} Ouro para despistar seus perseguidores e escapar!`);
-            }
+            logConsole(state.faintedTime > 0 ? `✨ Pagou ${state.penaltyCost} Ouro e despertou.` : `💨 Pagou ${state.penaltyCost} Ouro e escapou!`);
             state.faintedTime = 0; state.trappedTime = 0;
         }
         closePopup('revive-overlay'); updateUI();
     }
     
-    // --- CONQUISTAS ---
     function checkAchievements() {
-        let unlocked = false;
-        if(player.statsData.enemiesKilled >= 30 && !player.achievements.includes('cacador')) {
-            player.achievements.push('cacador'); unlocked = true; logConsole("🏆 Conquista Desbloqueada: Caçador!");
-        }
-        if(player.level >= 10 && !player.achievements.includes('explorador')) {
-            player.achievements.push('explorador'); unlocked = true; logConsole("🏆 Conquista Desbloqueada: Explorador!");
-        }
-        if(player.houseIndex >= 4 && !player.achievements.includes('rei')) {
-            player.achievements.push('rei'); unlocked = true; logConsole("🏆 Conquista Desbloqueada: Rei!");
-        }
-        if(unlocked) renderAchievements();
+        let u = false;
+        if(player.statsData.enemiesKilled >= 30 && !player.achievements.includes('cacador')) { player.achievements.push('cacador'); u = true; }
+        if(player.level >= 10 && !player.achievements.includes('explorador')) { player.achievements.push('explorador'); u = true; }
+        if(u) renderAchievements();
     }
-
     function renderAchievements() {
-        const div = document.getElementById('achievements-list');
-        if(!div) return;
-        div.innerHTML = '';
-        achievementsDb.forEach(ach => {
-            let isUnlocked = player.achievements.includes(ach.id);
-            let color = isUnlocked ? '#4caf50' : '#555';
-            div.innerHTML += `
-            <div style="border: 1px solid ${color}; padding: 10px; margin-bottom: 5px; border-radius: 4px; background: #222;">
-                <strong style="color:${color}">${ach.name}</strong> <small>(${ach.diff})</small><br>
-                <span style="font-size: 11px; color: ${isUnlocked ? '#ccc' : '#777'}">${ach.desc}</span>
-                <div style="font-size: 10px; margin-top:5px; color:${color}">${isUnlocked ? '✅ Desbloqueado' : '🔒 Bloqueado'}</div>
-            </div>`;
+        let div = document.getElementById('achievements-list'); div.innerHTML = '';
+        achievementsDb.forEach(a => {
+            let u = player.achievements.includes(a.id); let c = u ? '#4caf50' : '#555';
+            div.innerHTML += `<div style="border:1px solid ${c}; padding:10px; margin-bottom:5px; border-radius:4px; background:#222;"><strong style="color:${c}">${a.name}</strong><br><span style="font-size:11px;color:${u?'#ccc':'#777'}">${a.desc}</span></div>`;
         });
     }
 
-    // --- MISSÕES DINÂMICAS ---
     function generateUniqueQuest() {
-        let maxZoneIdx = getHighestZoneIndex();
-        let currentZone = zones[maxZoneIdx];
-        let pool = [];
-        
-        currentZone.enemies.forEach(e => {
-            if(e.isBoss) return;
-            let reqAmt = Math.floor(Math.random() * 3) + 2; 
-            let reward = Math.floor(e.gold * reqAmt * 1.5) + (maxZoneIdx * 30) + 15; 
-            pool.push({
-                desc: `Derrote ${reqAmt}x ${e.name}`, req: reqAmt, reward: reward, type: 'kill', category: `caça_${e.name}`, target: e.name
-            });
-        });
-
-        pool.push({ desc: 'Compre 1 item na Loja', req: 1, reward: 35 + (maxZoneIdx * 20), type: 'buy', category: 'loja' });
-        pool.push({ desc: 'Venda 5 Lixos', req: 5, reward: 20 + (maxZoneIdx * 10), type: 'sell', category: 'venda_lixo' });
-
-        let available = pool.filter(qp => !activeQuests.some(aq => aq.category === qp.category));
-        if (available.length === 0) return null;
-        
-        let q = available[Math.floor(Math.random() * available.length)];
-        return { ...q, progress: 0, uid: Date.now() + Math.random() };
+        let zIdx = getHighestZoneIndex(); let z = zones[zIdx]; let p = [];
+        z.enemies.forEach(e => { if(!e.isBoss) p.push({ desc:`Derrote ${Math.floor(Math.random()*3)+2}x ${e.name}`, req:2, reward:Math.floor(e.gold*3)+(zIdx*30)+15, type:'kill', category:`c_${e.name}`, target:e.name }); });
+        p.push({ desc:'Compre 1 item', req:1, reward:35+(zIdx*20), type:'buy', category:'loja' });
+        let av = p.filter(qp => !activeQuests.some(aq => aq.category === qp.category));
+        return av.length ? { ...av[Math.floor(Math.random() * av.length)], progress:0, uid:Date.now()+Math.random() } : null;
     }
 
-    function updateQuest(type, amount, extra = null) {
-        let changed = false;
-        activeQuests.forEach(q => {
-            if (q.type === type && q.progress < q.req) {
-                if (type === 'kill' && q.target !== extra) return;
-                q.progress = Math.min(q.req, q.progress + amount);
-                changed = true;
-            }
-        });
-        if (changed) { renderMissoes(); updateUI(); }
+    function updateQuest(type, amt, ext = null) {
+        let c = false;
+        activeQuests.forEach(q => { if (q.type === type && q.progress < q.req && (type !== 'kill' || q.target === ext)) { q.progress = Math.min(q.req, q.progress + amt); c = true; } });
+        if(c) { renderMissoes(); updateUI(); }
     }
     
     function renderMissoes() {
-        const container = document.getElementById('quest-list'); container.innerHTML = '';
+        let c = document.getElementById('quest-list'); c.innerHTML = '';
         activeQuests.forEach(q => {
-            let isDone = (q.progress >= q.req);
-            container.innerHTML += `
-            <div class="quest-item">
-                <div class="quest-info">
-                    <strong>${q.desc}</strong><br><small>Recompensa: ${q.reward} 🪙</small>
-                    <progress value="${q.progress}" max="${q.req}"></progress> <small>${q.progress}/${q.req}</small>
-                </div>
-                <div class="quest-btn-container">
-                    <button class="buy-btn" ${isDone ? 'style="background:#4caf50;"' : 'disabled'} onclick="claimQuest(${q.uid})">
-                        ${isDone ? 'Concluir' : 'Pendente'}
-                    </button>
-                </div>
-            </div>`;
+            let d = (q.progress >= q.req);
+            c.innerHTML += `<div class="quest-item"><div class="quest-info"><strong>${q.desc}</strong><br><small>Recompensa: ${q.reward} 🪙</small><progress value="${q.progress}" max="${q.req}"></progress> <small>${q.progress}/${q.req}</small></div>
+                <div class="quest-btn-container"><button class="buy-btn" ${d?'style="background:#4caf50;"':'disabled'} onclick="claimQuest(${q.uid})">${d?'Concluir':'Pendente'}</button></div></div>`;
         });
     }
 
     function grantBossKey() {
-        if(player.inventory.length < MAX_INVENTORY) {
-            player.inventory.push({
-                id: Date.now()+Math.random(), name: 'Chave do Chefe', emoji: '🔑', type: 'key', desc: 'Consumível usado para acessar um Chefe.', sellPrice: 0
-            });
-            state.hasNewItem = true;
-            logConsole(`🔑 <strong>Parabéns!</strong> Uma Chave do Chefe foi guardada na sua mochila.`);
-        } else {
-            logConsole(`❌ <strong>Aviso:</strong> Você ganhou uma Chave, mas perdeu porque sua mochila estava cheia!`);
-            showPopup("Sua mochila estava cheia e você perdeu a Chave do Chefe de recompensa das missões.");
-        }
+        if(player.inventory.length < MAX_INVENTORY) { player.inventory.push({ id: Date.now(), name: 'Chave do Chefe', emoji: '🔑', type: 'key', desc: 'Consumível.', sellPrice: 0 }); state.hasNewItem = true; }
     }
-
     function claimQuest(uid) {
-        let idx = activeQuests.findIndex(q => q.uid === uid);
-        if (idx > -1 && activeQuests[idx].progress >= activeQuests[idx].req) {
-            player.gold += activeQuests[idx].reward;
-            logConsole(`✅ Missão Concluída! Ganhou ${activeQuests[idx].reward} Ouro.`);
-            player.questsCompleted++;
-            if(player.questsCompleted >= 3) {
-                player.questsCompleted -= 3;
-                grantBossKey();
-            }
-            activeQuests.splice(idx, 1);
-            let newQ = generateUniqueQuest(); if(newQ) activeQuests.push(newQ);
+        let i = activeQuests.findIndex(q => q.uid === uid);
+        if (i > -1 && activeQuests[i].progress >= activeQuests[i].req) {
+            player.gold += activeQuests[i].reward; player.questsCompleted++;
+            if(player.questsCompleted >= 3) { player.questsCompleted -= 3; grantBossKey(); }
+            activeQuests.splice(i, 1); let n = generateUniqueQuest(); if(n) activeQuests.push(n);
             renderMissoes(); renderZones(); updateUI(); renderInventory();
         }
     }
 
-    // --- LOJA & CASAS ---
     function generateShop() {
-        state.shopItems = [];
-        let maxZoneIdx = getHighestZoneIndex();
-        let rates = shopRarityRates[Math.min(maxZoneIdx, 2)];
-        
+        state.shopItems = []; let max = Math.min(getHighestZoneIndex(), 2); let rates = shopRarityRates[max];
         for(let i=0; i<3; i++) {
-            let roll = Math.random() * 100;
-            let rIdx = 0, acc = 0;
-            for(let j=0; j<rates.length; j++) {
-                acc += rates[j];
-                if(roll <= acc) { rIdx = j; break; }
-            }
-            let rarity = rarities[rIdx];
-            let type = equipTypes[Math.floor(Math.random() * 16)];
-            while(!type.statValue && !type.baseVal) type = equipTypes[0]; 
-            
-            let baseVal = type.baseVal + (maxZoneIdx * 2);
-            let finalStat = baseVal * rarity.mult;
-            let buyPrice = baseVal * rarity.mult * 45; 
-            
-            state.shopItems.push({
-                type: 'equip', bought: false, price: buyPrice,
-                itemData: { name: type.name, type: 'equip', slot: type.slot, stat: type.stat, hands: type.hands, special: type.special, desc: type.desc, statValue: finalStat, rarity: rarity, sellPrice: baseVal*rarity.mult*15 }
-            });
+            let roll = Math.random()*100; let rIdx=0, acc=0;
+            for(let j=0; j<rates.length; j++) { acc+=rates[j]; if(roll<=acc) { rIdx=j; break; } }
+            let r = rarities[rIdx]; let t = equipTypes[Math.floor(Math.random()*16)]; while(!t.statValue && !t.baseVal) t=equipTypes[0]; 
+            let bv = t.baseVal+(max*2);
+            state.shopItems.push({ type:'equip', bought:false, price:bv*r.mult*45, itemData: { name:t.name, type:'equip', slot:t.slot, stat:t.stat, hands:t.hands, special:t.special, desc:t.desc, statValue:bv*r.mult, rarity:r, sellPrice:bv*r.mult*15 } });
         }
-        
-        state.shopItems.push({ type: 'potion', pType: 'hp', price: 30, bought: false });
-        state.shopItems.push({ type: 'potion', pType: 'energy', price: 30, bought: false });
-        
+        state.shopItems.push({ type:'potion', pType:'hp', price:30, bought:false });
+        state.shopItems.push({ type:'potion', pType:'energy', price:30, bought:false });
         if (document.getElementById('loja-list')) renderLoja();
     }
 
     function renderLoja() {
-        const container = document.getElementById('loja-list'); container.innerHTML = '';
+        let c = document.getElementById('loja-list'); c.innerHTML = '';
         state.shopItems.forEach((si, idx) => {
-            let btnHtml = si.bought ? 
-                `<button class="buy-btn" disabled>Esgotado</button>` : 
-                `<button class="buy-btn" id="btn-buy-${idx}" onclick="buyLojaItem(${idx})">🪙 ${si.price}</button>`;
-
+            let btn = si.bought ? `<button class="buy-btn" disabled>Esgotado</button>` : `<button class="buy-btn" id="btn-buy-${idx}" onclick="buyLojaItem(${idx})">🪙 ${si.price}</button>`;
             if(si.type === 'equip') {
                 let eq = si.itemData;
-                container.innerHTML += `
-                <div class="shop-item">
-                    <div class="shop-info">
-                        <strong class="${eq.rarity.color}">${eq.name}</strong><br>
-                        <span class="item-desc">${eq.desc}</span>
-                        <small class="stat-bonus">+${eq.statValue} ${eq.stat.toUpperCase()}</small>
-                    </div>
-                    <div class="shop-btn-container">${btnHtml}</div>
-                </div>`;
+                c.innerHTML += `<div class="shop-item"><div class="shop-info"><strong class="${eq.rarity.color}">${eq.name}</strong><br><span class="item-desc">${eq.desc}</span><small class="stat-bonus">+${eq.statValue} ${eq.stat.toUpperCase()}</small></div><div class="shop-btn-container">${btn}</div></div>`;
             } else {
-                let isHp = si.pType === 'hp';
-                container.innerHTML += `
-                <div class="shop-item">
-                    <div class="shop-info">
-                        <strong>${isHp?'❤️':'⚡'} Poção de ${isHp?'Vida':'Energia'}</strong><br>
-                        <span class="item-desc">Restaura 50%</span>
-                    </div>
-                    <div class="shop-btn-container">${btnHtml}</div>
-                </div>`;
+                c.innerHTML += `<div class="shop-item"><div class="shop-info"><strong>${si.pType==='hp'?'❤️':'⚡'} Poção</strong><br><span class="item-desc">Restaura 50%</span></div><div class="shop-btn-container">${btn}</div></div>`;
             }
         });
     }
 
-    function buyLojaItem(idx) {
-        let si = state.shopItems[idx];
-        if(si.bought) return;
-
-        if(player.inventory.length >= MAX_INVENTORY) {
-            showPopup("Sua mochila está cheia! Venda ou equipe itens antes de comprar.");
-            return;
-        }
-
-        if (player.gold >= si.price) {
-            player.gold -= si.price;
-            si.bought = true;
-            state.hasNewItem = true;
-            
-            if(si.type === 'equip') {
-                player.inventory.push({...si.itemData, id: Date.now() + Math.random()}); 
-                logConsole(`🛒 Comprou: ${si.itemData.name}.`);
-            } else {
-                let isHp = si.pType === 'hp';
-                player.inventory.push({
-                    id: Date.now()+Math.random(), name: isHp?'Poção de Vida':'Poção de Energia', emoji: isHp?'❤️':'⚡',
-                    type: 'potion', effect: si.pType, value: 0.5, sellPrice: 15
-                });
-                logConsole(`🛒 Comprou: Poção.`);
-            }
+    function buyLojaItem(i) {
+        let s = state.shopItems[i]; if(s.bought || state.raid.active) return;
+        if(player.inventory.length >= MAX_INVENTORY) return showPopup("Mochila cheia!");
+        if (player.gold >= s.price) {
+            player.gold -= s.price; s.bought = true; state.hasNewItem = true;
+            if(s.type === 'equip') player.inventory.push({...s.itemData, id: Date.now()}); 
+            else player.inventory.push({ id: Date.now(), name: s.pType==='hp'?'Poção de Vida':'Poção de Energia', emoji: s.pType==='hp'?'❤️':'⚡', type: 'potion', effect: s.pType, value: 0.5, sellPrice: 15 });
             updateQuest('buy', 1); renderInventory(); renderLoja(); updateUI();
         }
     }
 
     function renderCasa() {
-        const container = document.getElementById('house-list'); container.innerHTML = '';
-        houses.forEach((h, idx) => {
-            if (idx === 0) return; 
-            let isOwned = (player.houseIndex >= idx); let isCurrent = (player.houseIndex === idx);
-            let btnHtml = isCurrent ? `<button class="buy-btn" disabled style="background:#4caf50;color:white;">Atual</button>` :
-                          isOwned ? `<button class="buy-btn" disabled>Adquirida</button>` :
-                          `<button class="buy-btn" id="btn-house-${idx}" onclick="buyHouse(${idx})">🪙 ${h.price}</button>`;
-            container.innerHTML += `<div class="house-item ${isCurrent?'active-house':''}">
-                <div class="house-info"><strong>${h.emoji} ${h.name}</strong><br><span class="item-desc">${h.desc}</span></div>
-                <div class="shop-btn-container">${btnHtml}</div></div>`;
+        let c = document.getElementById('house-list'); c.innerHTML = '';
+        houses.forEach((h, i) => {
+            if (i === 0) return; 
+            let btn = (player.houseIndex === i) ? `<button class="buy-btn" disabled style="background:#4caf50;color:white;">Atual</button>` :
+                      (player.houseIndex >= i) ? `<button class="buy-btn" disabled>Adquirida</button>` : `<button class="buy-btn" id="btn-house-${i}" onclick="buyHouse(${i})">🪙 ${h.price}</button>`;
+            c.innerHTML += `<div class="house-item ${player.houseIndex===i?'active-house':''}"><div class="house-info"><strong>${h.emoji} ${h.name}</strong><br><span class="item-desc">${h.desc}</span></div><div class="shop-btn-container">${btn}</div></div>`;
         });
     }
 
-    function buyHouse(idx) {
-        let house = houses[idx];
-        if (player.gold >= house.price && player.houseIndex < idx) {
-            player.gold -= house.price; player.houseIndex = idx;
-            logConsole(`🏠 Mudou-se para: ${house.name}.`); 
-            checkAchievements();
-            renderCasa(); updateUI();
+    function buyHouse(i) {
+        if (player.gold >= houses[i].price && player.houseIndex < i && !state.raid.active) {
+            player.gold -= houses[i].price; player.houseIndex = i; renderCasa(); updateUI();
         }
     }
 
-    // --- MENUS INTERNOS (AJUSTES & PERSONAGEM) ---
-    function switchAjustesTab(tab) {
-        ['log', 'wiki', 'codex', 'dados'].forEach(t => {
-            document.getElementById('btn-tab-' + t).classList.remove('active');
-            document.getElementById('ajustes-' + t).classList.add('hidden');
-        });
-        document.getElementById('btn-tab-' + tab).classList.add('active');
-        document.getElementById('ajustes-' + tab).classList.remove('hidden');
+    // --- RAID SYSTEM ---
+    function startRaid(targetId) {
+        if (state.raid.active || state.faintedTime > 0) return;
+        let target = raidTargets.find(t => t.id === targetId);
+        
+        if (player.energy < target.energy) return showPopup(`A expedição requer <strong>${target.energy}⚡ Energia</strong>.<br>Você não tem o suficiente.`);
+        if (player.hp < player.maxHp * 0.5) return showPopup("Seu HP precisa estar acima de 50% para viajar!");
+        
+        player.energy -= target.energy;
+        state.raid = { active: true, phase: 'ida', targetId: target.id, timeTotal: target.travelTime, timeLeft: target.travelTime, lootGold: 0 };
+        logConsole(`🗺️ Expedição iniciada rumo a ${target.name}.`);
+        renderRaid(); updateUI();
     }
 
-    function switchPersonagemTab(tab) {
-        ['atributos', 'conquistas'].forEach(t => {
-            document.getElementById('btn-tab-' + t).classList.remove('active');
-            document.getElementById('personagem-' + t).classList.add('hidden');
-        });
-        document.getElementById('btn-tab-' + tab).classList.add('active');
-        document.getElementById('personagem-' + tab).classList.remove('hidden');
+    function renderRaid() {
+        const c = document.getElementById('raid-content'); c.innerHTML = '';
+        if (state.raid.active) {
+            let target = raidTargets.find(t => t.id === state.raid.targetId);
+            c.innerHTML = `
+            <div class="raid-active-container">
+                <h4>${state.raid.phase === 'ida' ? '🚶 Indo para' : '🎒 Retornando de'} ${target.name}</h4>
+                <div class="raid-timer">${formatTimeStr(state.raid.timeLeft)}</div>
+                <progress value="${state.raid.timeTotal - state.raid.timeLeft}" max="${state.raid.timeTotal}"></progress>
+                <p><small>${state.raid.phase === 'ida' ? 'O combate acontecerá na chegada.' : 'Seus ganhos serão creditados ao chegar em casa.'}</small></p>
+            </div>`;
+        } else {
+            raidTargets.forEach(t => {
+                c.innerHTML += `
+                <div class="raid-item">
+                    <div class="raid-info">
+                        <strong>${t.emoji} ${t.name}</strong><br>
+                        <small>Ida e Volta: ${Math.floor((t.travelTime*2)/60)} min</small><br>
+                        <span class="item-desc">Risco: ${t.diff} | Custo: ⚡ ${t.energy} | Recompensa: ~${t.goldBase} 🪙</span>
+                    </div>
+                    <div class="raid-btn-container">
+                        <button class="hunt-btn" onclick="startRaid('${t.id}')">Atacar</button>
+                    </div>
+                </div>`;
+            });
+        }
     }
 
-    // --- CAÇA & ABAS ---
-    function selectZone(index) {
-        if (index === state.activeZoneTab) return;
-        if (player.level >= zones[index].reqLevel) { state.activeZoneTab = index; renderZones(); }
+    function processRaidCombat() {
+        let target = raidTargets.find(t => t.id === state.raid.targetId);
+        let playerPower = (getStat('forca') * 2.5) + (getStat('defesa') * 0.5);
+        let chance = Math.max(5, Math.min(95, 50 + playerPower - target.diff));
+        
+        if ((Math.random() * 100) <= chance) {
+            let loot = target.goldBase + Math.floor(Math.random() * (target.goldBase * 0.5));
+            state.raid.lootGold = loot;
+            addAlert(`Vitória Invasão: ${target.name}`, `Sua equipe derrubou as defesas e encontrou ${loot} 🪙. Estão retornando.`);
+            logConsole(`🗺️ Invasão a ${target.name} venceu!`);
+        } else {
+            let hpLost = Math.floor(player.maxHp * 0.5);
+            player.hp = Math.max(1, player.hp - hpLost);
+            state.raid.lootGold = 0;
+            addAlert(`Derrota Invasão: ${target.name}`, `As defesas resistiram ao seu grupo. Você sofreu ${hpLost} de dano e recuou.`);
+            logConsole(`🗺️ Invasão a ${target.name} falhou.`);
+        }
+        state.raid.phase = 'volta';
+        state.raid.timeLeft = state.raid.timeTotal;
+        renderRaid();
     }
+
+    function finishRaid() {
+        if (state.raid.lootGold > 0) {
+            player.gold += state.raid.lootGold;
+            addAlert('Retorno de Expedição', `O grupo descarregou ${state.raid.lootGold} 🪙 nos seus cofres da base.`);
+        } else {
+            addAlert('Retorno de Expedição', `O grupo chegou de mãos vazias na sua base.`);
+        }
+        state.raid.active = false; state.raid.phase = null; state.raid.targetId = null; state.raid.lootGold = 0;
+        renderRaid(); updateUI();
+    }
+
+    // --- ALERTAS (RELATÓRIOS) ---
+    function renderAlertas() {
+        const c = document.getElementById('alerts-list'); c.innerHTML = '';
+        if(player.alerts.length === 0) { c.innerHTML = '<p>Nenhum relatório na sua caixa de entrada.</p>'; return; }
+        player.alerts.forEach(a => {
+            c.innerHTML += `
+            <div class="alert-item ${!a.read ? 'unread' : ''}" onclick="toggleAlert(${a.id})">
+                <div class="alert-info">
+                    <span class="alert-date">${a.date}</span>
+                    <strong>${a.title}</strong>
+                    <div id="alert-msg-${a.id}" class="alert-msg hidden">
+                        <span class="item-desc" style="color:#ddd;">${a.msg}</span>
+                    </div>
+                </div>
+            </div>`;
+        });
+    }
+
+    function toggleAlert(id) {
+        let a = player.alerts.find(x => x.id === id);
+        if(a && !a.read) {
+            a.read = true;
+            updateUI(); 
+        }
+        let msgDiv = document.getElementById(`alert-msg-${id}`);
+        if(msgDiv) msgDiv.classList.toggle('hidden');
+        renderAlertas(); 
+    }
+
+    function markAllAlertsRead() {
+        player.alerts.forEach(a => a.read = true);
+        renderAlertas(); updateUI();
+    }
+
+    function switchAjustesTab(t) { ['log', 'wiki', 'codex', 'notas', 'dados'].forEach(x => { document.getElementById('btn-tab-'+x).classList.remove('active'); document.getElementById('ajustes-'+x).classList.add('hidden'); }); document.getElementById('btn-tab-'+t).classList.add('active'); document.getElementById('ajustes-'+t).classList.remove('hidden'); }
+    function switchPersonagemTab(t) { ['atributos', 'conquistas'].forEach(x => { document.getElementById('btn-tab-'+x).classList.remove('active'); document.getElementById('personagem-'+x).classList.add('hidden'); }); document.getElementById('btn-tab-'+t).classList.add('active'); document.getElementById('personagem-'+t).classList.remove('hidden'); }
+
+    function selectZone(i) { if (i !== state.activeZoneTab && player.level >= zones[i].reqLevel) { state.activeZoneTab = i; renderZones(); } }
     
     function renderZones() {
-        const tabsContainer = document.getElementById('zone-tabs-container');
-        const contentContainer = document.getElementById('zone-content-container');
-        tabsContainer.innerHTML = ''; contentContainer.innerHTML = '';
-
-        zones.forEach((zone, idx) => {
-            let isLocked = player.level < zone.reqLevel;
-            let isActive = state.activeZoneTab === idx && !isLocked;
-            let classNames = `zone-tab ${isActive ? 'active' : ''} ${isLocked ? 'locked' : ''}`;
-            let label = isLocked ? `Nv ${zone.reqLevel}` : zone.name;
-            tabsContainer.innerHTML += `<button class="${classNames}" ${isActive ? 'disabled' : ''} onclick="selectZone(${idx})">${zone.emoji} ${label}</button>`;
+        const tc = document.getElementById('zone-tabs-container'); const cc = document.getElementById('zone-content-container');
+        tc.innerHTML = ''; cc.innerHTML = '';
+        zones.forEach((z, i) => {
+            let l = player.level < z.reqLevel; let a = state.activeZoneTab === i && !l;
+            tc.innerHTML += `<button class="zone-tab ${a?'active':''} ${l?'locked':''}" ${a?'disabled':''} onclick="selectZone(${i})">${z.emoji} ${l?`Nv ${z.reqLevel}`:z.name}</button>`;
         });
-
-        let activeZone = zones[state.activeZoneTab];
-        if (player.level >= activeZone.reqLevel) {
+        let az = zones[state.activeZoneTab];
+        if (player.level >= az.reqLevel) {
             let html = `<table><tr><th>Inimigo</th><th>Acerto</th><th>Ação</th></tr>`;
-            let hasKey = player.inventory.some(i => i.type === 'key');
-            
-            activeZone.enemies.forEach((enemy, eIndex) => {
-                let rowClass = enemy.isBoss ? 'class="boss-row"' : '';
-                let btnHtml = `<button class="hunt-btn" id="btn-hunt-${state.activeZoneTab}-${eIndex}" onclick="hunt(${state.activeZoneTab}, ${eIndex})">Lutar</button>`;
-                
-                if (enemy.isBoss) {
-                    if (hasKey) btnHtml = `<button class="hunt-btn" id="btn-hunt-${state.activeZoneTab}-${eIndex}" style="background:#f44336; font-weight:bold;" onclick="hunt(${state.activeZoneTab}, ${eIndex})">Usar Chave</button>`;
-                    else btnHtml = `<button class="hunt-btn" disabled>Precisa Chave</button>`;
-                }
-
-                let finalEn = getFinalEnergyCost(enemy.energyCost);
-                let currentTrapChance = getTrapChance(state.activeZoneTab, eIndex);
-                html += `<tr ${rowClass}>
-                    <td>${enemy.emoji} <strong>${enemy.name}</strong><br><small>XP: ${enemy.exp} | Ouro: ${enemy.gold}</small></td>
-                    <td><span id="chance-${state.activeZoneTab}-${eIndex}"></span>% <br><small>⚡ ${finalEn}</small> <span class="trap-risk" title="Risco de Prisão">Risco Preso: ${currentTrapChance}%</span></td>
-                    <td style="width: 100px;">${btnHtml}</td>
-                </tr>`;
+            let hk = player.inventory.some(i => i.type === 'key');
+            az.enemies.forEach((e, i) => {
+                let btn = e.isBoss ? (hk?`<button class="hunt-btn" id="btn-hunt-${state.activeZoneTab}-${i}" style="background:#f44336;font-weight:bold;" onclick="hunt(${state.activeZoneTab}, ${i})">Usar Chave</button>`:`<button class="hunt-btn" disabled>Precisa Chave</button>`) : `<button class="hunt-btn" id="btn-hunt-${state.activeZoneTab}-${i}" onclick="hunt(${state.activeZoneTab}, ${i})">Lutar</button>`;
+                html += `<tr ${e.isBoss?'class="boss-row"':''}><td>${e.emoji} <strong>${e.name}</strong><br><small>XP: ${e.exp} | Ouro: ${e.gold}</small></td><td><span id="chance-${state.activeZoneTab}-${i}"></span>% <br><small>⚡ ${getFinalEnergyCost(e.energyCost)}</small> <span class="trap-risk">Risco Preso: ${getTrapChance(state.activeZoneTab, i)}%</span></td><td style="width: 100px;">${btn}</td></tr>`;
             });
-            html += `</table>`; contentContainer.innerHTML = html;
+            cc.innerHTML = html + `</table>`;
         }
     }
 
-    // --- DROPS & COMBATE ---
     function rollDrops(zIndex, isBoss = false) {
-        let dropMessage = "";
-        let pendingItem = null; // Agora dropa estritamente NO MÁXIMO 1 item!
-        
+        let dm = ""; let p = null;
         if (isBoss) {
-            let rarity = rarities[4];
-            let type = equipTypes[Math.floor(Math.random() * 16)];
-            while(!type.statValue && !type.baseVal) type = equipTypes[0]; 
-            let baseVal = type.baseVal + (zIndex * 2); let finalStat = baseVal * rarity.mult;
-            pendingItem = { id: Date.now()+Math.random(), name: type.name, type: 'equip', slot: type.slot, stat: type.stat, hands: type.hands, special: type.special, desc: type.desc, statValue: finalStat, rarity: rarity, sellPrice: baseVal*rarity.mult*15 };
+            let r = rarities[4]; let t = equipTypes[Math.floor(Math.random()*16)]; while(!t.statValue&&!t.baseVal) t=equipTypes[0]; 
+            p = { id:Date.now(), name:t.name, type:'equip', slot:t.slot, stat:t.stat, hands:t.hands, special:t.special, desc:t.desc, statValue:(t.baseVal+(zIndex*2))*r.mult, rarity:r, sellPrice:(t.baseVal+(zIndex*2))*r.mult*15 };
         } else {
             let roll = Math.random();
-            if (roll < 0.35) { // 35% de chance de Equipamento
-                let rRoll = Math.random() * 100; 
-                let rarity = rarities[0]; let acc = 0;
-                let zRates = dropRates[zIndex];
-                for(let i=0; i<zRates.length; i++) { acc += zRates[i]; if(rRoll <= acc) { rarity = rarities[i]; break; } }
-                
-                let type = equipTypes[Math.floor(Math.random() * 16)]; 
-                while(!type.statValue && !type.baseVal) type = equipTypes[0]; 
-                
-                let baseVal = type.baseVal + (zIndex * 2); let finalStat = baseVal * rarity.mult;
-                pendingItem = { id: Date.now()+Math.random(), name: type.name, type: 'equip', slot: type.slot, stat: type.stat, hands: type.hands, special: type.special, desc: type.desc, statValue: finalStat, rarity: rarity, sellPrice: baseVal*rarity.mult*15 };
-            } 
-            else if (roll < 0.50) { // 15% de chance de Poção (0.35 a 0.50)
-                let isHp = Math.random() > 0.5;
-                pendingItem = { id: Date.now()+Math.random(), name: isHp?'Poção de Vida':'Poção de Energia', emoji: isHp?'❤️':'⚡', type: 'potion', effect: isHp?'hp':'energy', value: 0.5, sellPrice: 15 };
-            } 
-            else if (roll < 0.90) { // 40% de chance de Lixo (0.50 a 0.90)
-                let trash = trashItems[Math.floor(Math.random() * trashItems.length)];
-                pendingItem = { name: trash, type: 'trash', sellPrice: (zIndex + 1)*3 + Math.floor(Math.random()*5) };
+            if (roll < 0.35) {
+                let rRoll = Math.random()*100; let r=rarities[0]; let a=0; let zR=dropRates[zIndex];
+                for(let i=0; i<zR.length; i++) { a+=zR[i]; if(rRoll<=a) { r=rarities[i]; break; } }
+                let t = equipTypes[Math.floor(Math.random()*16)]; while(!t.statValue&&!t.baseVal) t=equipTypes[0]; 
+                p = { id:Date.now(), name:t.name, type:'equip', slot:t.slot, stat:t.stat, hands:t.hands, special:t.special, desc:t.desc, statValue:(t.baseVal+(zIndex*2))*r.mult, rarity:r, sellPrice:(t.baseVal+(zIndex*2))*r.mult*15 };
+            } else if (roll < 0.50) {
+                let h = Math.random()>0.5; p = { id:Date.now(), name:h?'Poção de Vida':'Poção de Energia', emoji:h?'❤️':'⚡', type:'potion', effect:h?'hp':'energy', value:0.5, sellPrice:15 };
+            } else if (roll < 0.90) {
+                p = { name:trashItems[Math.floor(Math.random()*trashItems.length)], type:'trash', sellPrice:(zIndex+1)*3+Math.floor(Math.random()*5) };
             }
-            // 10% restante de não dropar absolutamente nada.
         }
-
-        if (pendingItem) {
-            if (player.inventory.length >= MAX_INVENTORY) {
-                dropMessage += `<span style="color:#f44336">Mochila cheia! Você deixou 1x ${pendingItem.name} para trás.</span><br>`;
-                showPopup(`Sua mochila está cheia! Um item (${pendingItem.name}) foi deixado para trás.`);
-            } else {
-                player.inventory.push(pendingItem);
-                state.hasNewItem = true;
-                if(pendingItem.type === 'equip') dropMessage += `✨ <strong>Obteve:</strong> <span class="${pendingItem.rarity.color}">${pendingItem.name}</span> (+${pendingItem.statValue})<br>`;
-                else if(pendingItem.type === 'potion') dropMessage += `🧪 <strong>Obteve:</strong> ${pendingItem.name}<br>`;
-                else dropMessage += `📦 <strong>Obteve:</strong> ${pendingItem.name}<br>`;
-            }
-        } else {
-            dropMessage += "<em>Nenhum item dropou.</em>";
-        }
-        
-        renderInventory(); return dropMessage;
+        if (p) {
+            if (player.inventory.length >= MAX_INVENTORY) { dm += `<span style="color:#f44336">Mochila cheia! Perdeu ${p.name}.</span><br>`; } 
+            else { player.inventory.push(p); state.hasNewItem = true; dm += `✨ Obteve: ${p.name}<br>`; }
+        } else dm += "<em>Nenhum drop.</em>";
+        renderInventory(); return dm;
     }
 
-    function hunt(zIndex, eIndex) {
-        if (state.faintedTime > 0 || state.trappedTime > 0 || state.cooldown > 0) return;
-        
-        let enemy = zones[zIndex].enemies[eIndex];
-        let finalEn = getFinalEnergyCost(enemy.energyCost);
-        let mods = getCombatModifiers();
-        let keyIndex = player.inventory.findIndex(i => i.type === 'key');
-        
-        if (player.energy < finalEn) return;
-        if (enemy.isBoss && keyIndex === -1) return;
-
-        player.energy -= finalEn;
-        if (enemy.isBoss) { 
-            player.inventory.splice(keyIndex, 1); 
-            logConsole(`🔑 Você utilizou uma Chave do Chefe para acessar a batalha!`);
-        }
-
-        let chance = getChance(zIndex, eIndex);
-        let actionMessage = "";
-
-        if ((Math.random() * 100) <= chance) {
-            player.exp += enemy.exp; player.gold += enemy.gold;
-            player.statsData.enemiesKilled++;
-            
-            actionMessage = `<strong>Vitória sobre o ${enemy.emoji} ${enemy.name}!</strong><br>Ganhou ${enemy.exp} EXP e ${enemy.gold} Ouro.<br><br>`;
-            if(!enemy.isBoss) updateQuest('kill', 1, enemy.name); 
-
-            let drops = rollDrops(zIndex, enemy.isBoss);
-            if (drops) actionMessage += drops; else actionMessage += "<em>Nenhum item dropou.</em>";
-            
-            checkAchievements();
-            checkLevelUp();
+    function hunt(z, e) {
+        if (state.faintedTime > 0 || state.trappedTime > 0 || state.cooldown > 0 || state.raid.active) return;
+        let en = zones[z].enemies[e]; let fEn = getFinalEnergyCost(en.energyCost);
+        let ki = player.inventory.findIndex(i => i.type === 'key');
+        if (player.energy < fEn || (en.isBoss && ki === -1)) return;
+        player.energy -= fEn; if (en.isBoss) { player.inventory.splice(ki, 1); }
+        let am = "";
+        if ((Math.random()*100) <= getChance(z, e)) {
+            player.exp += en.exp; player.gold += en.gold; player.statsData.enemiesKilled++;
+            am = `<strong>Vitória sobre o ${en.emoji} ${en.name}!</strong><br>Ganhou ${en.exp} EXP e ${en.gold} Ouro.<br><br>`;
+            if(!en.isBoss) updateQuest('kill', 1, en.name); 
+            am += rollDrops(z, en.isBoss); checkAchievements(); checkLevelUp();
         } else {
-            let defMitigation = Math.floor(getStat('defesa') * 0.2);
-            let finalDmg = Math.max(1, enemy.dmg - defMitigation);
-            if(mods.hasCajado) finalDmg = Math.floor(finalDmg * 0.7); 
+            let fd = Math.max(1, en.dmg - Math.floor(getStat('defesa')*0.2));
+            if(getCombatModifiers().hasCajado) fd = Math.floor(fd*0.7); 
+            player.hp -= fd; am = `<strong>Falha Crítica!</strong><br>Perdeu ${fd} HP.`;
             
-            player.hp -= finalDmg;
-            actionMessage = `<strong>Falha Crítica!</strong><br>O ${enemy.emoji} ${enemy.name} revidou e você perdeu ${finalDmg} HP.`;
-            
-            let trapped = false;
-            let currentTrapChance = getTrapChance(zIndex, eIndex);
-            
-            if (player.hp > 0 && Math.random() * 100 <= currentTrapChance) trapped = true;
-
             if (player.hp <= 0) {
-                player.hp = 0; 
-                state.faintedTime = 30 * 60; 
-                state.penaltyCost = calculatePenalty(zIndex);
-                actionMessage += `<br><br>💀 <strong>VOCÊ DESMAIOU!</strong>`;
-                handleStatusClick();
-            } else if (trapped) {
-                state.trappedTime = 30 * 60;
-                state.penaltyCost = calculatePenalty(zIndex);
-                actionMessage += `<br><br>🕸️ <strong>FALHA NA FUGA!</strong><br>Você ficou preso na área.`;
-                handleStatusClick();
-            } else {
-                 actionMessage += `<br><em>Você conseguiu fugir em segurança.</em>`;
-            }
+                player.hp = 0; state.faintedTime = PENALTY_TIMES[z] || 1800; state.penaltyCost = calculatePenalty(z);
+                am += `<br><br>💀 <strong>VOCÊ DESMAIOU!</strong>`; handleStatusClick();
+            } else if (Math.random()*100 <= getTrapChance(z, e)) {
+                state.trappedTime = PENALTY_TIMES[z] || 1800; state.penaltyCost = calculatePenalty(z);
+                am += `<br><br>🕸️ <strong>PRESO NA FUGA!</strong>`; handleStatusClick();
+            } else am += `<br><em>Você fugiu em segurança.</em>`;
         }
-        
         if (player.hp > 0 && state.trappedTime === 0) state.cooldown = 5; 
-        logConsole(actionMessage.replace(/<br>/g, " ")); showPopup(actionMessage); 
-        
-        renderInventory(); renderZones(); updateUI();
+        logConsole(am.replace(/<br>/g, " ")); showPopup(am); renderInventory(); renderZones(); updateUI();
     }
 
     function checkLevelUp() {
-        let leveledUp = false;
-        while (player.exp >= player.expNext) {
-            player.exp -= player.expNext; player.level++; player.expNext = Math.floor(player.expNext * 1.5); 
-            player.statPoints += 4; leveledUp = true;
-            logConsole(`🎉 Nível ${player.level} alcançado! (+4 Pontos)`);
-        }
-        if (leveledUp) { 
-            calcMaxStats(); player.hp = player.maxHp; player.energy = player.maxEnergy; 
-            if (player.level === 5 || player.level === 10) { 
-                logConsole(`🗺️ Nova zona de caça desbloqueada! A loja foi abastecida com itens novos!`); 
-                generateShop();
-            }
-            checkAchievements(); renderZones(); updateUI(); 
-        }
+        let lu = false; while (player.exp >= player.expNext) { player.exp -= player.expNext; player.level++; player.expNext = Math.floor(player.expNext * 1.5); player.statPoints += 4; lu = true; }
+        if (lu) { calcMaxStats(); player.hp = player.maxHp; player.energy = player.maxEnergy; if (player.level === 5 || player.level === 10) generateShop(); renderZones(); updateUI(); }
     }
 
-    // --- INVENTÁRIO & ATALHOS DE POÇÃO ---
     function renderInventory() {
-        let invCountEl = document.getElementById('inv-count');
-        if(invCountEl) invCountEl.innerText = player.inventory.length;
-
-        const slotsDiv = document.getElementById('equip-slots'); slotsDiv.innerHTML = '';
-        const slotConfig = [
-            { key: 'cabeca', label: 'Cabeça' }, { key: 'corpo', label: 'Corpo' },
-            { key: 'mao_esq', label: 'Mão Esquerda' }, { key: 'mao_dir', label: 'Mão Direita' },
-            { key: 'pes', label: 'Pés' }
-        ];
-        
-        slotConfig.forEach(cfg => {
-            let item = player.equipped[cfg.key];
-            if (item) {
-                if (item.isBlocked) {
-                    slotsDiv.innerHTML += `<div class="item-box border-comum" style="opacity:0.6"><small>${cfg.label}</small><br><em>(Ocupado 2 Mãos)</em></div>`;
-                } else {
-                    slotsDiv.innerHTML += `
-                    <div class="item-box border-${item.rarity.color}">
-                        <small>${cfg.label}</small><br><span class="${item.rarity.color}">${item.name}</span><br>
-                        <span class="item-desc">${item.desc||''}</span>
-                        <small class="stat-bonus">+${item.statValue} ${item.stat.toUpperCase()}</small><br>
-                        <button class="action-btn" onclick="unequipSlot('${cfg.key}')">Desequipar</button>
-                    </div>`;
-                }
-            } else {
-                slotsDiv.innerHTML += `<div class="item-box border-comum"><small>${cfg.label}</small><br><em>Vazio</em></div>`;
-            }
+        let ic = document.getElementById('inv-count'); if(ic) ic.innerText = player.inventory.length;
+        let sd = document.getElementById('equip-slots'); sd.innerHTML = '';
+        [{key:'cabeca',label:'Cabeça'},{key:'corpo',label:'Corpo'},{key:'mao_esq',label:'Mão Esq'},{key:'mao_dir',label:'Mão Dir'},{key:'pes',label:'Pés'}].forEach(c => {
+            let i = player.equipped[c.key];
+            if (i) {
+                if (i.isBlocked) sd.innerHTML += `<div class="item-box border-comum" style="opacity:0.6"><small>${c.label}</small><br><em>(2 Mãos)</em></div>`;
+                else sd.innerHTML += `<div class="item-box border-${i.rarity.color}"><small>${c.label}</small><br><span class="${i.rarity.color}">${i.name}</span><br><small class="stat-bonus">+${i.statValue} ${i.stat.toUpperCase()}</small><br><button class="action-btn" onclick="unequipSlot('${c.key}')">Desequipar</button></div>`;
+            } else sd.innerHTML += `<div class="item-box border-comum"><small>${c.label}</small><br><em>Vazio</em></div>`;
         });
-
-        const bagDiv = document.getElementById('inventory-list'); bagDiv.innerHTML = '';
-        if (player.inventory.length === 0) { bagDiv.innerHTML = '<p>Sua mochila está vazia.</p>'; return; }
-
-        let groupedItems = [];
-        player.inventory.forEach((item, index) => {
-            let key = item.type === 'equip' ? `${item.name}-${item.rarity.id}` :
-                      item.type === 'potion' ? `${item.name}` :
-                      item.type === 'key' ? `${item.name}` : `${item.name}`; 
-            
-            let existing = groupedItems.find(g => g.key === key);
-            if(existing) { existing.count++; existing.indexes.push(index); } 
-            else { groupedItems.push({ key: key, item: item, count: 1, indexes: [index] }); }
+        let bd = document.getElementById('inventory-list'); bd.innerHTML = '';
+        if (player.inventory.length === 0) { bd.innerHTML = '<p>Sua mochila está vazia.</p>'; return; }
+        let grps = [];
+        player.inventory.forEach((i, idx) => {
+            let k = i.type==='equip'?`${i.name}-${i.rarity.id}`:i.name; 
+            let e = grps.find(g => g.k === k); if(e) { e.c++; e.idxs.push(idx); } else { grps.push({k:k,i:i,c:1,idxs:[idx]}); }
         });
-
-        groupedItems.forEach((group) => {
-            let item = group.item;
-            let realIndex = group.indexes[0];
-            let countBadge = group.count > 1 ? `<span class="item-count">x${group.count}</span>` : '';
-
-            if (item.type === 'equip') {
-                bagDiv.innerHTML += `
-                <div class="item-box border-${item.rarity.color}">
-                    <span class="${item.rarity.color}">${item.name}</span>${countBadge} <small class="stat-bonus">(+${item.statValue} ${item.stat.toUpperCase()})</small><br>
-                    <span class="item-desc">${item.desc||''}</span>
-                    <small>Venda: ${item.sellPrice} Ouro</small><br>
-                    <div style="display:flex; gap:5px;">
-                        <button class="action-btn buy-btn" onclick="equipItem(${realIndex})">Equipar</button>
-                        <button class="action-btn" onclick="sellItem(${realIndex})">Vender</button>
-                    </div>
-                </div>`;
-            } else if (item.type === 'potion') {
-                bagDiv.innerHTML += `
-                <div class="item-box border-potion">
-                    <span>${item.emoji} ${item.name}</span>${countBadge} <small>(Restaura 50%)</small><br>
-                    <small>Venda: ${item.sellPrice} Ouro</small><br>
-                    <div style="display:flex; gap:5px;">
-                        <button class="action-btn buy-btn" style="background:#e91e63;" onclick="usePotion(${realIndex})">Usar</button>
-                        <button class="action-btn" onclick="sellItem(${realIndex})">Vender</button>
-                    </div>
-                </div>`;
-            } else if (item.type === 'key') {
-                bagDiv.innerHTML += `
-                <div class="item-box border-lendario" style="background:rgba(255,215,0,0.1)">
-                    <span>${item.emoji} ${item.name}</span>${countBadge} <small>(Especial)</small><br>
-                    <span class="item-desc">${item.desc}</span>
-                    <button class="action-btn" disabled>Não vendável</button>
-                </div>`;
-            } else {
-                bagDiv.innerHTML += `
-                <div class="item-box border-lixo">
-                    <span>${item.name}</span>${countBadge} <small>(Lixo)</small><br>
-                    <small>Venda: ${item.sellPrice} Ouro</small><br>
-                    <button class="action-btn buy-btn" onclick="sellItem(${realIndex})">Vender</button>
-                </div>`;
-            }
+        grps.forEach(g => {
+            let i = g.i; let ri = g.idxs[0]; let cb = g.c>1?`<span class="item-count">x${g.c}</span>`:'';
+            if (i.type === 'equip') bd.innerHTML += `<div class="item-box border-${i.rarity.color}"><span class="${i.rarity.color}">${i.name}</span>${cb} <small>(+${i.statValue} ${i.stat.toUpperCase()})</small><br><small>Venda: ${i.sellPrice} Ouro</small><br><div style="display:flex;gap:5px;"><button class="action-btn buy-btn" onclick="equipItem(${ri})">Equipar</button><button class="action-btn" onclick="sellItem(${ri})">Vender</button></div></div>`;
+            else if (i.type === 'potion') bd.innerHTML += `<div class="item-box border-potion"><span>${i.emoji} ${i.name}</span>${cb}<br><small>Venda: ${i.sellPrice} Ouro</small><br><div style="display:flex;gap:5px;"><button class="action-btn buy-btn" style="background:#e91e63;" onclick="usePotion(${ri})">Usar</button><button class="action-btn" onclick="sellItem(${ri})">Vender</button></div></div>`;
+            else if (i.type === 'key') bd.innerHTML += `<div class="item-box border-lendario" style="background:rgba(255,215,0,0.1)"><span>${i.emoji} ${i.name}</span>${cb}<br><button class="action-btn" disabled>Não vendável</button></div>`;
+            else bd.innerHTML += `<div class="item-box border-lixo"><span>${i.name}</span>${cb} <small>(Lixo)</small><br><small>Venda: ${i.sellPrice} Ouro</small><br><button class="action-btn buy-btn" onclick="sellItem(${ri})">Vender</button></div>`;
         });
     }
 
-    function usePotion(index) {
-        let pot = player.inventory[index];
-        if (pot.effect === 'hp') { player.hp = Math.min(player.maxHp, player.hp + (player.maxHp * pot.value)); logConsole(`🧪 Usou Poção de Vida.`); } 
-        else { player.energy = Math.min(player.maxEnergy, player.energy + (player.maxEnergy * pot.value)); logConsole(`🧪 Usou Poção de Energia.`); }
-        player.inventory.splice(index, 1); renderInventory(); updateUI();
-    }
+    function usePotion(i) { let p = player.inventory[i]; if (p.effect === 'hp') { player.hp = Math.min(player.maxHp, player.hp+(player.maxHp*p.value)); } else { player.energy = Math.min(player.maxEnergy, player.energy+(player.maxEnergy*p.value)); } player.inventory.splice(i, 1); renderInventory(); updateUI(); }
+    function quickUsePotion(e) { let i = player.inventory.findIndex(x => x.type === 'potion' && x.effect === e); if (i !== -1) usePotion(i); }
 
-    function quickUsePotion(effect) {
-        let idx = player.inventory.findIndex(i => i.type === 'potion' && i.effect === effect);
-        if (idx !== -1) usePotion(idx);
-    }
-
-    function equipItem(index) {
-        let item = player.inventory[index];
-        if (item.slot === 'hand') {
-            if (item.hands === 2) {
-                unequipInternal('mao_dir'); unequipInternal('mao_esq');
-                player.equipped.mao_dir = item;
-                player.equipped.mao_esq = { isBlocked: true };
-            } else {
-                if (player.equipped.mao_dir?.hands === 2) unequipInternal('mao_dir'); 
-                
-                if (!player.equipped.mao_dir || player.equipped.mao_dir.isBlocked) {
-                    unequipInternal('mao_dir'); player.equipped.mao_dir = item;
-                } else if (!player.equipped.mao_esq) {
-                    player.equipped.mao_esq = item;
-                } else {
-                    unequipInternal('mao_dir'); player.equipped.mao_dir = item;
-                }
+    function equipItem(i) {
+        let it = player.inventory[i];
+        if (it.slot === 'hand') {
+            if (it.hands === 2) { uInt('mao_dir'); uInt('mao_esq'); player.equipped.mao_dir = it; player.equipped.mao_esq = { isBlocked: true }; } 
+            else {
+                if (player.equipped.mao_dir?.hands === 2) uInt('mao_dir'); 
+                if (!player.equipped.mao_dir || player.equipped.mao_dir.isBlocked) { uInt('mao_dir'); player.equipped.mao_dir = it; } 
+                else if (!player.equipped.mao_esq) { player.equipped.mao_esq = it; } 
+                else { uInt('mao_dir'); player.equipped.mao_dir = it; }
             }
-        } else {
-            unequipInternal(item.slot); player.equipped[item.slot] = item;
-        }
-        player.inventory.splice(index, 1);
-        calcMaxStats(); renderInventory(); renderZones(); updateUI();
+        } else { uInt(it.slot); player.equipped[it.slot] = it; }
+        player.inventory.splice(i, 1); calcMaxStats(); renderInventory(); renderZones(); updateUI();
     }
+    function unequipSlot(s) { let e = player.equipped[s]; if (!e) return; if(player.inventory.length >= MAX_INVENTORY && !e.isBlocked) return showPopup("Mochila cheia!"); if (e.isBlocked) uInt('mao_dir'); else uInt(s); calcMaxStats(); renderInventory(); renderZones(); updateUI(); }
+    function uInt(s) { let i = player.equipped[s]; if (!i) return; if (i.isBlocked) { player.equipped[s] = null; return; } player.inventory.push(i); player.equipped[s] = null; if (i.hands === 2 && s === 'mao_dir') player.equipped.mao_esq = null; }
+    function sellItem(i) { let it = player.inventory[i]; player.gold += it.sellPrice; if(it.type === 'trash') updateQuest('sell', 1); player.inventory.splice(i, 1); renderInventory(); updateUI(); }
+    function sellAllTrash() { let e = 0, c = 0; for (let i = player.inventory.length-1; i>=0; i--) { if (player.inventory[i].type === 'trash') { e += player.inventory[i].sellPrice; c++; player.inventory.splice(i, 1); } } if (e > 0) { player.gold += e; updateQuest('sell', c); renderInventory(); updateUI(); } }
 
-    function unequipSlot(slotName) {
-        let eq = player.equipped[slotName];
-        if (!eq) return;
-        if(player.inventory.length >= MAX_INVENTORY && !eq.isBlocked) {
-            showPopup("Sua mochila está cheia! Não é possível desequipar o item.");
-            return;
-        }
-
-        if (eq.isBlocked) { unequipInternal('mao_dir'); } 
-        else { unequipInternal(slotName); }
-        calcMaxStats(); renderInventory(); renderZones(); updateUI();
-    }
-    
-    function unequipInternal(slotName) {
-        let item = player.equipped[slotName];
-        if (!item) return;
-        if (item.isBlocked) { player.equipped[slotName] = null; return; }
-        
-        player.inventory.push(item);
-        player.equipped[slotName] = null;
-        if (item.hands === 2 && slotName === 'mao_dir') { player.equipped.mao_esq = null; }
-    }
-
-    function sellItem(index) {
-        let item = player.inventory[index]; player.gold += item.sellPrice;
-        if(item.type === 'trash') updateQuest('sell', 1);
-        player.inventory.splice(index, 1); renderInventory(); updateUI();
-    }
-    
-    function sellAllTrash() {
-        let earned = 0; let count = 0;
-        for (let i = player.inventory.length - 1; i >= 0; i--) {
-            if (player.inventory[i].type === 'trash') {
-                earned += player.inventory[i].sellPrice; count++; player.inventory.splice(i, 1);
-            }
-        }
-        if (earned > 0) { player.gold += earned; updateQuest('sell', count); renderInventory(); updateUI(); }
-    }
-
-    // --- GAME LOOP & UI ---
     function gameLoop() {
-        let changed = false; let currentHouse = houses[player.houseIndex];
+        let ch = false; let cH = houses[player.houseIndex];
 
-        // HP/EN SEMPRE Regeneram agora, independentemente do status
         state.hpTick++;
-        if (state.hpTick >= 2) { 
-            if (player.hp < player.maxHp) { player.hp = Math.min(player.maxHp, player.hp + (player.maxHp * currentHouse.hpRegen)); changed = true; }
-            state.hpTick = 0;
-        }
-        if (player.energy < player.maxEnergy) { player.energy = Math.min(player.maxEnergy, player.energy + currentHouse.enRegen); changed = true; }
-        if (state.cooldown > 0) { state.cooldown--; changed = true; }
+        if (state.hpTick >= 2) { if (player.hp < player.maxHp) { player.hp = Math.min(player.maxHp, player.hp + (player.maxHp * cH.hpRegen)); ch = true; } state.hpTick = 0; }
+        if (player.energy < player.maxEnergy) { player.energy = Math.min(player.maxEnergy, player.energy + cH.enRegen); ch = true; }
+        if (state.cooldown > 0) { state.cooldown--; ch = true; }
 
-        if (state.faintedTime > 0) {
-            state.faintedTime--;
-            if (state.faintedTime <= 0) { 
-                logConsole("✨ Seu tempo de desmaio passou. Você despertou!"); 
-                changed = true; 
-            }
-            if(state.faintedTime % 60 === 0 || state.faintedTime > 0) changed = true;
-        } else if (state.trappedTime > 0) {
-            state.trappedTime--;
-            if (state.trappedTime <= 0) { logConsole("💨 A barra limpa. Você finalmente escapou do esconderijo."); changed = true; }
-            if(state.trappedTime % 60 === 0 || state.trappedTime > 0) changed = true;
-        } 
-        
-        if (changed) updateUI();
+        if (state.raid.active) {
+            state.raid.timeLeft--;
+            if (state.raid.timeLeft <= 0) {
+                if (state.raid.phase === 'ida') processRaidCombat();
+                else if (state.raid.phase === 'volta') finishRaid();
+            } else if (state.raid.timeLeft % 60 === 0 || state.raid.timeLeft < 10) renderRaid();
+            ch = true;
+        }
+
+        if (state.faintedTime > 0) { state.faintedTime--; if (state.faintedTime <= 0) ch = true; if(state.faintedTime % 60 === 0) ch = true; } 
+        else if (state.trappedTime > 0) { state.trappedTime--; if (state.trappedTime <= 0) ch = true; if(state.trappedTime % 60 === 0) ch = true; } 
+        if (ch) updateUI();
     }
 
-    function showPopup(htmlMsg) { document.getElementById('popup-text').innerHTML = htmlMsg; document.getElementById('popup-overlay').classList.remove('hidden'); }
+    function showPopup(m) { document.getElementById('popup-text').innerHTML = m; document.getElementById('popup-overlay').classList.remove('hidden'); }
     function closePopup(id) { document.getElementById(id).classList.add('hidden'); }
-    
-    function logConsole(msg) {
-        const logBox = document.getElementById('log-box'); const time = new Date().toLocaleTimeString('pt-BR');
-        const entry = document.createElement('div'); entry.className = 'log-entry'; entry.innerHTML = `<em>[${time}]</em> - ${msg}`;
-        logBox.prepend(entry);
-    }
-    
-    function showMenu(menuName) {
-        document.querySelectorAll('.menu-section').forEach(el => el.classList.add('hidden'));
-        document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
-        document.getElementById('menu-' + menuName).classList.remove('hidden');
-        
-        let btn = document.getElementById('nav-' + menuName); btn.classList.add('active');
-        const nav = document.getElementById('bottom-nav');
-        if (nav && btn) { const scrollLeft = btn.offsetLeft - (nav.clientWidth / 2) + (btn.clientWidth / 2); nav.scrollTo({ left: scrollLeft, behavior: 'smooth' }); }
-
-        if(menuName === 'inventario') {
-            state.hasNewItem = false;
-            updateUI();
-        }
-    }
-    
-    function getStatText(statName) {
-        let base = player.stats[statName]; let total = getStat(statName); let bonus = total - base; let html = base;
-        if (bonus > 0) html += ` <span class="stat-bonus">(+${bonus})</span>`;
-        if (player.statPoints > 0) html += ` <button class="add-stat-btn" onclick="addStat('${statName}')">+</button>`;
-        return html;
-    }
+    function logConsole(m) { const l = document.getElementById('log-box'); let t = new Date().toLocaleTimeString('pt-BR'); let e = document.createElement('div'); e.className = 'log-entry'; e.innerHTML = `<em>[${t}]</em> - ${m}`; l.prepend(e); }
+    function showMenu(n) { document.querySelectorAll('.menu-section').forEach(e => e.classList.add('hidden')); document.querySelectorAll('.nav-btn').forEach(e => e.classList.remove('active')); document.getElementById('menu-'+n).classList.remove('hidden'); let b = document.getElementById('nav-'+n); b.classList.add('active'); const v = document.getElementById('bottom-nav'); if (v && b) { v.scrollTo({ left: b.offsetLeft - (v.clientWidth/2) + (b.clientWidth/2), behavior: 'smooth' }); } if(n === 'inventario') { state.hasNewItem = false; updateUI(); } }
+    function getStatText(s) { let b = player.stats[s]; let t = getStat(s); let o = t - b; let h = b; if (o > 0) h += ` <span class="stat-bonus">(+${o})</span>`; if (player.statPoints > 0) h += ` <button class="add-stat-btn" onclick="addStat('${s}')">+</button>`; return h; }
 
     function updateUI() {
         document.getElementById('hp').innerText = Math.floor(player.hp); document.getElementById('maxHp').innerText = player.maxHp;
@@ -1312,78 +970,52 @@
         document.getElementById('expNext').innerText = player.expNext; document.getElementById('gold').innerText = player.gold;
         document.getElementById('shop-gold').innerText = player.gold;
 
-        let currentHouse = houses[player.houseIndex];
-        let hpRegenAmt = player.maxHp * currentHouse.hpRegen;
-        let hpTime = (player.hp >= player.maxHp) ? 0 : Math.ceil(((1 - (player.hp % 1)) / hpRegenAmt) * 2);
-        if(hpTime === Infinity || isNaN(hpTime) || hpTime < 0) hpTime = 0;
-        document.getElementById('timer-hp').innerText = player.hp >= player.maxHp ? "" : `(+${hpTime}s)`;
+        let cH = houses[player.houseIndex];
+        let hpRegenPerSec = (player.maxHp * cH.hpRegen) / 2; let missingHp = player.maxHp - player.hp; let hpFullTime = missingHp > 0 ? Math.ceil(missingHp / hpRegenPerSec) : 0;
+        document.getElementById('timer-hp').innerText = player.hp >= player.maxHp ? "" : `(${formatTimeStr(hpFullTime)})`;
         
-        let enRegenAmt = currentHouse.enRegen;
-        let enTime = (player.energy >= player.maxEnergy) ? 0 : Math.ceil((1 - (player.energy % 1)) / enRegenAmt);
-        if(enTime === Infinity || isNaN(enTime) || enTime < 0) enTime = 0;
-        document.getElementById('timer-en').innerText = player.energy >= player.maxEnergy ? "" : `(+${enTime}s)`;
+        let missingEn = player.maxEnergy - player.energy; let enFullTime = missingEn > 0 ? Math.ceil(missingEn / cH.enRegen) : 0;
+        document.getElementById('timer-en').innerText = player.energy >= player.maxEnergy ? "" : `(${formatTimeStr(enFullTime)})`;
 
-        document.getElementById('stat-forca').innerHTML = getStatText('forca'); document.getElementById('stat-defesa').innerHTML = getStatText('defesa');
-        document.getElementById('stat-inteligencia').innerHTML = getStatText('inteligencia'); document.getElementById('stat-saude').innerHTML = getStatText('saude');
+        document.getElementById('stat-forca').innerHTML = getStatText('forca'); document.getElementById('stat-defesa').innerHTML = getStatText('defesa'); document.getElementById('stat-inteligencia').innerHTML = getStatText('inteligencia'); document.getElementById('stat-saude').innerHTML = getStatText('saude');
 
-        if (player.statPoints > 0) {
-            document.getElementById('badge-personagem').classList.remove('hidden'); document.getElementById('unspent-alert').classList.remove('hidden');
-            document.getElementById('stat-points').innerText = player.statPoints;
-        } else {
-            document.getElementById('badge-personagem').classList.add('hidden'); document.getElementById('unspent-alert').classList.add('hidden');
-        }
-
-        let pendingQuests = activeQuests.filter(q => q.progress >= q.req).length;
-        if (pendingQuests > 0) document.getElementById('badge-missoes').classList.remove('hidden'); else document.getElementById('badge-missoes').classList.add('hidden');
+        if (player.statPoints > 0) { document.getElementById('badge-personagem').classList.remove('hidden'); document.getElementById('unspent-alert').classList.remove('hidden'); document.getElementById('stat-points').innerText = player.statPoints; } 
+        else { document.getElementById('badge-personagem').classList.add('hidden'); document.getElementById('unspent-alert').classList.add('hidden'); }
 
         document.getElementById('boss-key-progress').innerText = `${player.questsCompleted}/3`;
+        if (activeQuests.filter(q => q.progress >= q.req).length > 0) document.getElementById('badge-missoes').classList.remove('hidden'); else document.getElementById('badge-missoes').classList.add('hidden');
+        if (state.hasNewItem) document.getElementById('badge-inventario').classList.remove('hidden'); else document.getElementById('badge-inventario').classList.add('hidden');
+        if (player.alerts.some(a => !a.read)) document.getElementById('badge-alertas').classList.remove('hidden'); else document.getElementById('badge-alertas').classList.add('hidden');
 
-        if (state.hasNewItem) document.getElementById('badge-inventario').classList.remove('hidden');
-        else document.getElementById('badge-inventario').classList.add('hidden');
+        let sm = "", da = false, se = document.getElementById('status-msg');
+        let isRaiding = state.raid.active;
 
-        let statusMsg = ""; let disableAction = false; let statusEl = document.getElementById('status-msg');
-
-        if (state.faintedTime > 0) {
-            let m = Math.floor(state.faintedTime / 60).toString().padStart(2, '0');
-            let s = (state.faintedTime % 60).toString().padStart(2, '0');
-            statusMsg = `💀 Desmaiado... Clique pagar o resgate (${state.penaltyCost}🪙) ou aguarde ${m}:${s}`;
-            disableAction = true; statusEl.classList.add('status-msg-clickable');
+        if (isRaiding) {
+            sm = `🗺️ ${state.raid.phase === 'ida' ? 'A caminho do alvo' : 'Retornando à base'} (${formatTimeStr(state.raid.timeLeft)})`; da = true; se.classList.remove('status-msg-clickable');
+        } else if (state.faintedTime > 0) {
+            sm = `💀 Desmaiado... Clique pagar (${state.penaltyCost}🪙) ou aguarde ${formatTimeStr(state.faintedTime)}`; da = true; se.classList.add('status-msg-clickable');
         } else if (state.trappedTime > 0) {
-            let m = Math.floor(state.trappedTime / 60).toString().padStart(2, '0');
-            let s = (state.trappedTime % 60).toString().padStart(2, '0');
-            statusMsg = `🕸️ Preso! Clique para Fugir (${state.penaltyCost}🪙) ou aguarde ${m}:${s}`;
-            disableAction = true; statusEl.classList.add('status-msg-clickable');
+            sm = `🕸️ Preso! Clique para Fugir (${state.penaltyCost}🪙) ou aguarde ${formatTimeStr(state.trappedTime)}`; da = true; se.classList.add('status-msg-clickable');
         } else {
-            statusEl.classList.remove('status-msg-clickable');
-            if (state.cooldown > 0) { statusMsg = `⏳ Descansando. Aguarde ${state.cooldown}s`; disableAction = true; } 
-            else { statusMsg = "🟢 Pronto para agir."; }
+            se.classList.remove('status-msg-clickable');
+            if (state.cooldown > 0) { sm = `⏳ Descansando. Aguarde ${state.cooldown}s`; da = true; } else { sm = "🟢 Pronto para agir."; }
         }
-        statusEl.innerText = statusMsg;
+        se.innerText = sm;
 
         if (player.level >= zones[state.activeZoneTab].reqLevel) {
-            zones[state.activeZoneTab].enemies.forEach((enemy, eIndex) => {
-                const chanceEl = document.getElementById(`chance-${state.activeZoneTab}-${eIndex}`);
-                const btnEl = document.getElementById(`btn-hunt-${state.activeZoneTab}-${eIndex}`);
-                let finalEn = getFinalEnergyCost(enemy.energyCost);
-                
-                if (chanceEl) chanceEl.innerText = getChance(state.activeZoneTab, eIndex);
-                if (btnEl) {
-                    if (disableAction) btnEl.disabled = true;
-                    else if (player.energy < finalEn) btnEl.disabled = true; 
-                    else btnEl.disabled = false;
-                }
+            zones[state.activeZoneTab].enemies.forEach((e, i) => {
+                let ce = document.getElementById(`chance-${state.activeZoneTab}-${i}`); let be = document.getElementById(`btn-hunt-${state.activeZoneTab}-${i}`);
+                if (ce) ce.innerText = getChance(state.activeZoneTab, i);
+                if (be) be.disabled = (da || isRaiding || player.energy < getFinalEnergyCost(e.energyCost));
             });
         }
 
-        let hpPots = player.inventory.filter(i => i.type === 'potion' && i.effect === 'hp').length;
-        let enPots = player.inventory.filter(i => i.type === 'potion' && i.effect === 'energy').length;
-        let btnHp = document.getElementById('btn-quick-hp');
-        let btnEn = document.getElementById('btn-quick-en');
-        if(btnHp) { btnHp.innerText = `❤️ Poção HP (${hpPots})`; btnHp.disabled = (hpPots === 0); }
-        if(btnEn) { btnEn.innerText = `⚡ Poção EN (${enPots})`; btnEn.disabled = (enPots === 0); }
+        let hpP = player.inventory.filter(i => i.type === 'potion' && i.effect === 'hp').length; let enP = player.inventory.filter(i => i.type === 'potion' && i.effect === 'energy').length;
+        let bH = document.getElementById('btn-quick-hp'), bE = document.getElementById('btn-quick-en');
+        if(bH) { bH.innerText = `❤️ Poção HP (${hpP})`; bH.disabled = (hpP === 0); } if(bE) { bE.innerText = `⚡ Poção EN (${enP})`; bE.disabled = (enP === 0); }
 
-        state.shopItems.forEach((si, idx) => { let btn = document.getElementById(`btn-buy-${idx}`); if (btn && !si.bought) btn.disabled = (player.gold < si.price); });
-        houses.forEach((house, idx) => { if (idx === 0) return; let btn = document.getElementById(`btn-house-${idx}`); if (btn) btn.disabled = (player.gold < house.price); });
+        state.shopItems.forEach((s, i) => { let b = document.getElementById(`btn-buy-${i}`); if (b && !s.bought) b.disabled = isRaiding || (player.gold < s.price); });
+        houses.forEach((h, i) => { if (i === 0) return; let b = document.getElementById(`btn-house-${i}`); if (b) b.disabled = isRaiding || (player.gold < h.price); });
     }
 
     window.onload = init;
