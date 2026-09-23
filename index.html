@@ -31,9 +31,11 @@
             background: #252525; border-radius: 4px;
         }
         .status-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-weight: bold;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-weight: bold; align-items: center;
         }
         .timer-text { font-size: 11px; color: #aaa; font-weight: normal; margin-left: 5px; }
+        .info-icon { cursor: pointer; font-size: 14px; margin-left: 5px; filter: grayscale(100%); transition: 0.2s; }
+        .info-icon:hover { filter: grayscale(0%); transform: scale(1.1); }
 
         .bottom-nav-wrapper {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
@@ -109,7 +111,7 @@
         .border-potion { border-left-color: #e91e63; }
         
         .inv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .stat-bonus { color: #aaaaaa; font-size: 0.9em; }
+        .stat-bonus { color: #aaaaaa; font-size: 0.9em; } 
         .item-desc { font-size: 11px; color: #aaa; font-style: italic; display: block; margin-bottom: 5px;}
         .item-count { color: #fff; font-weight: bold; background: #333; padding: 2px 5px; border-radius: 4px; font-size: 11px; margin-left: 5px; }
 
@@ -159,8 +161,14 @@
     
     <div class="status-bar">
         <div class="status-grid">
-            <div>❤️ HP: <span id="hp"></span> / <span id="maxHp"></span> <span id="timer-hp" class="timer-text"></span></div>
-            <div>⚡ EN: <span id="energy"></span> / <span id="maxEnergy"></span> <span id="timer-en" class="timer-text"></span></div>
+            <div>❤️ HP: <span id="hp"></span> / <span id="maxHp"></span> 
+                 <span class="info-icon" onclick="showInfo('hp')" title="Detalhes de Regeneração">ℹ️</span> 
+                 <span id="timer-hp" class="timer-text"></span>
+            </div>
+            <div>⚡ EN: <span id="energy"></span> / <span id="maxEnergy"></span> 
+                 <span class="info-icon" onclick="showInfo('en')" title="Detalhes de Regeneração">ℹ️</span> 
+                 <span id="timer-en" class="timer-text"></span>
+            </div>
             <div>🌟 Nível: <span id="level"></span></div>
             <div>✨ EXP: <span id="exp"></span> / <span id="expNext"></span></div>
             <div>🪙 Ouro: <span id="gold"></span></div>
@@ -182,7 +190,7 @@
                 <tr><td>💪 FORÇA</td><td id="stat-forca"></td><td><small>Dano, +2.5% Acerto</small></td></tr>
                 <tr><td>🛡️ DEFESA</td><td id="stat-defesa"></td><td><small>-20% Dano Recb., +0.5% Acerto</small></td></tr>
                 <tr><td>🧠 INTELIGÊNCIA</td><td id="stat-inteligencia"></td><td><small>+10 Energia Máx</small></td></tr>
-                <tr><td>❤️ SAÚDE</td><td id="stat-saude"></td><td><small>+10 HP Máx</small></td></tr>
+                <tr><td>❤️ SAÚDE</td><td id="stat-saude"></td><td><small>+10 HP Máx, Aumenta Fuga</small></td></tr>
             </table>
         </div>
 
@@ -252,13 +260,13 @@
 
         <!-- SUBMENU WIKI -->
         <div id="ajustes-wiki" class="hidden wiki-content">
-            <h3>Enciclopédia do Jogo (Versão 15)</h3>
+            <h3>Enciclopédia do Jogo (Versão 16)</h3>
             
-            <h4>1. Limite da Mochila e Saves</h4>
-            <p>Sua mochila pode carregar apenas <strong>8 itens</strong> simultaneamente. Se não houver espaço, novos itens de chefes ou inimigos serão irremediavelmente perdidos. O jogo salva o progresso automaticamente a cada 10 segundos.</p>
+            <h4>1. Limite da Mochila</h4>
+            <p>Sua mochila pode carregar apenas <strong>8 itens</strong> simultaneamente. Se não houver espaço, novos itens de chefes ou inimigos serão irremediavelmente perdidos.</p>
 
             <h4>2. Taxas de Drop de Equipamentos</h4>
-            <p>Os itens largados por inimigos comuns variam de acordo com a área. Os Chefes dropam 1 item Lendário garantido.</p>
+            <p>Um inimigo só pode dropar <strong>no máximo 1 item</strong> por vitória, seja equipamento, poção ou lixo. Os Chefes dropam 1 item Lendário garantido.</p>
             <table>
                 <tr>
                     <th>Área</th>
@@ -274,8 +282,14 @@
             </table>
 
             <h4>3. Combate, Acerto e Fuga</h4>
-            <p><strong>Cálculo de Acerto:</strong> Chance Base Inimigo + (Força * 2.5) + (Defesa * 0.5) +/- Modificadores de Armas. O limite máximo de sucesso absoluto é travado em <strong>95%</strong>, não importa sua força.</p>
-            <p><strong>Fuga e Prisão:</strong> Caso erre o ataque e receba dano, há 10% de chance (reduzido para 5% com Arco) de ficar <strong>Preso</strong>. Impede a ação por 30 minutos ou até pagar 5 moedas de ouro.</p>
+            <p><strong>Cálculo de Acerto:</strong> O limite máximo de sucesso absoluto é travado em <strong>95%</strong>, não importa sua força.</p>
+            <p><strong>Fuga e Prisão:</strong> Caso erre o ataque e receba dano, há o risco de ficar <strong>Preso</strong>. A chance base é de 10%, aumentando em 5% por cada Zona mais avançada e 2% pela dificuldade (ordem) do inimigo na lista. Sua Saúde <strong>reduz</strong> ativamente esse risco em 0.5% por ponto total.</p>
+
+            <h4>4. Desmaio, Prisão e Custos</h4>
+            <p>Seja desmaiado ou preso, sua <strong>Energia e HP continuarão regenerando normalmente</strong>. A punição o impede de agir por 30 minutos ou até você pagar a fiança/resgate instantâneo. <br><br>
+            <strong>Custo do Resgate:</strong> É dinâmico e atrelado ao seu poder e localização.<br> 
+            Fórmula: <code>(Nível da Zona * 100) + (Valor de Venda da Mochila * 0.8)</code>.<br>
+            <em>Nota: Pagar o resgate não cura o HP ou Energia instantaneamente, ele apenas te liberta da penalidade de tempo.</em></p>
         </div>
 
         <!-- SUBMENU CODEX -->
@@ -298,7 +312,6 @@
         <button class="nav-btn active" id="nav-personagem" onclick="showMenu('personagem')">
             👤<span id="badge-personagem" class="badge hidden">!</span><span class="label">Status</span>
         </button>
-        <!-- BADGE DA MOCHILA INCLUÍDO AQUI -->
         <button class="nav-btn" id="nav-inventario" onclick="showMenu('inventario')">
             🎒<span id="badge-inventario" class="badge hidden">!</span><span class="label">Mochila</span>
         </button>
@@ -332,12 +345,9 @@
 <div id="revive-overlay" class="hidden popup-overlay">
     <div class="popup-box">
         <h3 style="margin-top:0; color:#f44336;" id="revive-title">💀 Status Crítico!</h3>
-        <div class="popup-text" id="revive-desc">
-            Você está incapacitado de agir.<br><br>
-            Deseja pagar <strong>5 Ouro</strong> para se recuperar instantaneamente?
-        </div>
+        <div class="popup-text" id="revive-desc"></div>
         <div style="display:flex; gap:10px;">
-            <button class="buy-btn" id="btn-revive-pay" onclick="revive(true)" style="background:#4caf50;">Pagar 5 🪙</button>
+            <button class="buy-btn" id="btn-revive-pay" onclick="revive(true)" style="background:#4caf50;">Pagar</button>
             <button class="action-btn" onclick="revive(false)">Esperar</button>
         </div>
     </div>
@@ -361,7 +371,7 @@
 
     let state = { 
         cooldown: 0, faintedTime: 0, trappedTime: 0, activeZoneTab: 0, hpTick: 0, shopItems: [],
-        hasNewItem: false
+        hasNewItem: false, penaltyCost: 0
     };
     let activeQuests = [];
 
@@ -445,12 +455,12 @@
     // --- SALVAMENTO E CARREGAMENTO ---
     function saveGame(manual = false) {
         let saveObj = { player: player, state: state, activeQuests: activeQuests };
-        localStorage.setItem('mh_save_v15', JSON.stringify(saveObj));
+        localStorage.setItem('mh_save_v16', JSON.stringify(saveObj));
         if(manual) { logConsole("💾 Progresso salvo manualmente!"); showPopup("Progresso salvo com sucesso!"); }
     }
 
     function loadGame() {
-        let saved = localStorage.getItem('mh_save_v15') || localStorage.getItem('mh_save_v14') || localStorage.getItem('mh_save_v13') || localStorage.getItem('mh_save_v12');
+        let saved = localStorage.getItem('mh_save_v16') || localStorage.getItem('mh_save_v15') || localStorage.getItem('mh_save_v14') || localStorage.getItem('mh_save_v13') || localStorage.getItem('mh_save_v12');
         if (saved) {
             let parsed = JSON.parse(saved);
             player = {...player, ...parsed.player};
@@ -460,6 +470,7 @@
             if(!player.statsData) player.statsData = { enemiesKilled: 0 };
             if(!player.achievements) player.achievements = [];
             if(state.hasNewItem === undefined) state.hasNewItem = false;
+            if(state.penaltyCost === undefined && (state.faintedTime > 0 || state.trappedTime > 0)) state.penaltyCost = 5; // Compatibilidade retroativa
             
             if(player.bossKeys !== undefined && player.bossKeys > 0) {
                 for(let i=0; i<player.bossKeys; i++) grantBossKey();
@@ -474,6 +485,7 @@
 
     function resetGame() {
         if(confirm("ATENÇÃO: Você tem certeza que deseja apagar todo o seu progresso? Isso não poderá ser desfeito.")) {
+            localStorage.removeItem('mh_save_v16');
             localStorage.removeItem('mh_save_v15');
             localStorage.removeItem('mh_save_v14');
             localStorage.removeItem('mh_save_v13');
@@ -499,9 +511,26 @@
         renderCodex();
         renderZones(); renderInventory(); renderLoja(); renderCasa(); renderMissoes(); renderAchievements(); updateUI();
         
-        // Intervalos restaurados
         setInterval(gameLoop, 1000); 
         setInterval(saveGame, 10000); // Salva a cada 10 segundos
+    }
+
+    // --- INTERAÇÕES INFO UI ---
+    function showInfo(type) {
+        let currentHouse = houses[player.houseIndex];
+        if (type === 'hp') {
+            let regenPerSec = (player.maxHp * currentHouse.hpRegen) / 2;
+            let missing = player.maxHp - player.hp;
+            let timeSec = missing > 0 ? Math.ceil(missing / regenPerSec) : 0;
+            let m = Math.floor(timeSec / 60); let s = timeSec % 60;
+            showPopup(`<strong>❤️ Recuperação de HP</strong><br><br>Sua casa atual (${currentHouse.name}) garante uma recuperação de:<br><strong>${regenPerSec.toFixed(1)} HP por segundo.</strong><br><br>Tempo para HP completo: <strong>${m}m ${s}s</strong>`);
+        } else {
+            let regenPerSec = currentHouse.enRegen;
+            let missing = player.maxEnergy - player.energy;
+            let timeSec = missing > 0 ? Math.ceil(missing / regenPerSec) : 0;
+            let m = Math.floor(timeSec / 60); let s = timeSec % 60;
+            showPopup(`<strong>⚡ Recuperação de Energia</strong><br><br>Sua casa atual (${currentHouse.name}) garante uma recuperação de:<br><strong>${regenPerSec.toFixed(1)} EN por segundo.</strong><br><br>Tempo para EN completa: <strong>${m}m ${s}s</strong>`);
+        }
     }
 
     function renderCodex() {
@@ -550,8 +579,7 @@
         let hasAdaga = (eD?.special === 'adaga' || eE?.special === 'adaga');
         let hasArco = (eD?.special === 'arco');
         let hasCajado = (eD?.special === 'cajado');
-        let trapChance = hasArco ? 5 : 10; 
-        return { hasAdaga, hasArco, hasCajado, trapChance };
+        return { hasAdaga, hasArco, hasCajado };
     }
 
     function getFinalEnergyCost(baseCost) {
@@ -567,35 +595,49 @@
         return Math.floor(Math.max(5, Math.min(95, chance)));
     }
 
+    function getTrapChance(zIndex, eIndex) {
+        let mods = getCombatModifiers();
+        // Base 10 + (Z*5) + (E*2) - (Saúde*0.5)
+        let chance = 10 + (zIndex * 5) + (eIndex * 2) - Math.floor(getStat('saude') * 0.5);
+        if (mods.hasArco) chance -= 5;
+        return Math.max(2, Math.min(90, chance)); // clamp entre 2% e 90%
+    }
+
     function addStat(statName) {
         if (player.statPoints > 0) {
             player.stats[statName]++; player.statPoints--; calcMaxStats(); updateUI();
         }
     }
 
+    function calculatePenalty(zIndex) {
+        let invValue = player.inventory.reduce((sum, item) => sum + (item.sellPrice || 0), 0);
+        return Math.floor(((zIndex + 1) * 100) + (invValue * 0.8));
+    }
+
     // --- INTERAÇÕES DE ESTADO (DESMAIO / PRESO) ---
     function handleStatusClick() {
         if(state.faintedTime > 0) {
             document.getElementById('revive-title').innerText = "💀 Desmaiado!";
-            document.getElementById('revive-desc').innerHTML = "Você perdeu todo seu HP.<br><br>Deseja pagar <strong>5 Ouro</strong> para curar seu HP instantaneamente?";
-            document.getElementById('btn-revive-pay').disabled = (player.gold < 5);
+            document.getElementById('revive-desc').innerHTML = `Você está incapacitado de agir, mas seu corpo continua regenerando <strong>HP e EN normalmente</strong> ao longo do tempo.<br><br>Deseja pagar <strong>${state.penaltyCost} Ouro</strong> para despertar instantaneamente (sem curar)?`;
+            document.getElementById('btn-revive-pay').innerText = `Pagar ${state.penaltyCost} 🪙`;
+            document.getElementById('btn-revive-pay').disabled = (player.gold < state.penaltyCost);
             document.getElementById('revive-overlay').classList.remove('hidden');
         } else if (state.trappedTime > 0) {
             document.getElementById('revive-title').innerText = "🕸️ Preso na Fuga!";
-            document.getElementById('revive-desc').innerHTML = "Sua fuga falhou e você está encurralado.<br><br>Deseja pagar <strong>5 Ouro</strong> para escapar instantaneamente?";
-            document.getElementById('btn-revive-pay').disabled = (player.gold < 5);
+            document.getElementById('revive-desc').innerHTML = `Você está encurralado! Seu corpo continua regenerando <strong>HP e EN normalmente</strong> enquanto escondido.<br><br>Deseja subornar e pagar <strong>${state.penaltyCost} Ouro</strong> para escapar instantaneamente?`;
+            document.getElementById('btn-revive-pay').innerText = `Pagar ${state.penaltyCost} 🪙`;
+            document.getElementById('btn-revive-pay').disabled = (player.gold < state.penaltyCost);
             document.getElementById('revive-overlay').classList.remove('hidden');
         }
     }
 
     function revive(pay) {
-        if(pay && player.gold >= 5) {
-            player.gold -= 5;
+        if(pay && player.gold >= state.penaltyCost) {
+            player.gold -= state.penaltyCost;
             if(state.faintedTime > 0) {
-                player.hp = player.maxHp;
-                logConsole("✨ Você pagou 5 Ouro e se recuperou do desmaio!");
+                logConsole(`✨ Você pagou ${state.penaltyCost} Ouro aos clérigos locais e despertou imediatamente.`);
             } else {
-                logConsole("💨 Você pagou 5 Ouro e conseguiu escapar da armadilha!");
+                logConsole(`💨 Você usou ${state.penaltyCost} Ouro para despistar seus perseguidores e escapar!`);
             }
             state.faintedTime = 0; state.trappedTime = 0;
         }
@@ -605,7 +647,6 @@
     // --- CONQUISTAS ---
     function checkAchievements() {
         let unlocked = false;
-
         if(player.statsData.enemiesKilled >= 30 && !player.achievements.includes('cacador')) {
             player.achievements.push('cacador'); unlocked = true; logConsole("🏆 Conquista Desbloqueada: Caçador!");
         }
@@ -698,7 +739,7 @@
             state.hasNewItem = true;
             logConsole(`🔑 <strong>Parabéns!</strong> Uma Chave do Chefe foi guardada na sua mochila.`);
         } else {
-            logConsole(`❌ <strong>Aviso:</strong> Você ganhou uma Chave do Chefe, mas perdeu porque sua mochila estava cheia!`);
+            logConsole(`❌ <strong>Aviso:</strong> Você ganhou uma Chave, mas perdeu porque sua mochila estava cheia!`);
             showPopup("Sua mochila estava cheia e você perdeu a Chave do Chefe de recompensa das missões.");
         }
     }
@@ -878,7 +919,6 @@
         let activeZone = zones[state.activeZoneTab];
         if (player.level >= activeZone.reqLevel) {
             let html = `<table><tr><th>Inimigo</th><th>Acerto</th><th>Ação</th></tr>`;
-            let mods = getCombatModifiers();
             let hasKey = player.inventory.some(i => i.type === 'key');
             
             activeZone.enemies.forEach((enemy, eIndex) => {
@@ -891,9 +931,10 @@
                 }
 
                 let finalEn = getFinalEnergyCost(enemy.energyCost);
+                let currentTrapChance = getTrapChance(state.activeZoneTab, eIndex);
                 html += `<tr ${rowClass}>
                     <td>${enemy.emoji} <strong>${enemy.name}</strong><br><small>XP: ${enemy.exp} | Ouro: ${enemy.gold}</small></td>
-                    <td><span id="chance-${state.activeZoneTab}-${eIndex}"></span>% <br><small>⚡ ${finalEn}</small> <span class="trap-risk" title="Risco de Prisão">Risco Preso: ${mods.trapChance}%</span></td>
+                    <td><span id="chance-${state.activeZoneTab}-${eIndex}"></span>% <br><small>⚡ ${finalEn}</small> <span class="trap-risk" title="Risco de Prisão">Risco Preso: ${currentTrapChance}%</span></td>
                     <td style="width: 100px;">${btnHtml}</td>
                 </tr>`;
             });
@@ -902,66 +943,56 @@
     }
 
     // --- DROPS & COMBATE ---
-    function generatePotion() {
-        let isHp = Math.random() > 0.5;
-        return { id: Date.now()+Math.random(), name: isHp?'Poção de Vida':'Poção de Energia', emoji: isHp?'❤️':'⚡', type: 'potion', effect: isHp?'hp':'energy', value: 0.5, sellPrice: 15 };
-    }
-
     function rollDrops(zIndex, isBoss = false) {
         let dropMessage = "";
-        let pendingItems = [];
+        let pendingItem = null; // Agora dropa estritamente NO MÁXIMO 1 item!
         
         if (isBoss) {
             let rarity = rarities[4];
             let type = equipTypes[Math.floor(Math.random() * 16)];
             while(!type.statValue && !type.baseVal) type = equipTypes[0]; 
             let baseVal = type.baseVal + (zIndex * 2); let finalStat = baseVal * rarity.mult;
-            
-            pendingItems.push({ id: Date.now()+Math.random(), name: type.name, type: 'equip', slot: type.slot, stat: type.stat, hands: type.hands, special: type.special, desc: type.desc, statValue: finalStat, rarity: rarity, sellPrice: baseVal*rarity.mult*15 });
-            pendingItems.push(generatePotion());
+            pendingItem = { id: Date.now()+Math.random(), name: type.name, type: 'equip', slot: type.slot, stat: type.stat, hands: type.hands, special: type.special, desc: type.desc, statValue: finalStat, rarity: rarity, sellPrice: baseVal*rarity.mult*15 };
         } else {
-            if (Math.random() < 0.40) {
-                let trash = trashItems[Math.floor(Math.random() * trashItems.length)];
-                pendingItems.push({ name: trash, type: 'trash', sellPrice: (zIndex + 1)*3 + Math.floor(Math.random()*5) });
-            }
-            if (Math.random() < 0.35) { 
-                let roll = Math.random() * 100; 
+            let roll = Math.random();
+            if (roll < 0.35) { // 35% de chance de Equipamento
+                let rRoll = Math.random() * 100; 
                 let rarity = rarities[0]; let acc = 0;
                 let zRates = dropRates[zIndex];
-                for(let i=0; i<zRates.length; i++) { acc += zRates[i]; if(roll <= acc) { rarity = rarities[i]; break; } }
+                for(let i=0; i<zRates.length; i++) { acc += zRates[i]; if(rRoll <= acc) { rarity = rarities[i]; break; } }
                 
                 let type = equipTypes[Math.floor(Math.random() * 16)]; 
                 while(!type.statValue && !type.baseVal) type = equipTypes[0]; 
                 
                 let baseVal = type.baseVal + (zIndex * 2); let finalStat = baseVal * rarity.mult;
-                pendingItems.push({ id: Date.now()+Math.random(), name: type.name, type: 'equip', slot: type.slot, stat: type.stat, hands: type.hands, special: type.special, desc: type.desc, statValue: finalStat, rarity: rarity, sellPrice: baseVal*rarity.mult*15 });
+                pendingItem = { id: Date.now()+Math.random(), name: type.name, type: 'equip', slot: type.slot, stat: type.stat, hands: type.hands, special: type.special, desc: type.desc, statValue: finalStat, rarity: rarity, sellPrice: baseVal*rarity.mult*15 };
+            } 
+            else if (roll < 0.50) { // 15% de chance de Poção (0.35 a 0.50)
+                let isHp = Math.random() > 0.5;
+                pendingItem = { id: Date.now()+Math.random(), name: isHp?'Poção de Vida':'Poção de Energia', emoji: isHp?'❤️':'⚡', type: 'potion', effect: isHp?'hp':'energy', value: 0.5, sellPrice: 15 };
+            } 
+            else if (roll < 0.90) { // 40% de chance de Lixo (0.50 a 0.90)
+                let trash = trashItems[Math.floor(Math.random() * trashItems.length)];
+                pendingItem = { name: trash, type: 'trash', sellPrice: (zIndex + 1)*3 + Math.floor(Math.random()*5) };
             }
-            if (Math.random() < 0.15) pendingItems.push(generatePotion());
+            // 10% restante de não dropar absolutamente nada.
         }
 
-        let freeSlots = MAX_INVENTORY - player.inventory.length;
-        if (pendingItems.length > 0) {
-            if (freeSlots <= 0) {
-                dropMessage += `<span style="color:#f44336">Mochila cheia! Itens perdidos.</span><br>`;
-                showPopup("Sua mochila está cheia! Alguns itens do monstro foram perdidos. Esvazie sua mochila.");
+        if (pendingItem) {
+            if (player.inventory.length >= MAX_INVENTORY) {
+                dropMessage += `<span style="color:#f44336">Mochila cheia! Você deixou 1x ${pendingItem.name} para trás.</span><br>`;
+                showPopup(`Sua mochila está cheia! Um item (${pendingItem.name}) foi deixado para trás.`);
             } else {
-                let limit = Math.min(pendingItems.length, freeSlots);
-                for(let i=0; i<limit; i++) {
-                    let item = pendingItems[i];
-                    player.inventory.push(item);
-                    state.hasNewItem = true;
-                    if(item.type === 'equip') dropMessage += `✨ <strong>Obteve:</strong> <span class="${item.rarity.color}">${item.name}</span> (+${item.statValue})<br>`;
-                    else if(item.type === 'potion') dropMessage += `🧪 <strong>Obteve:</strong> ${item.name}<br>`;
-                    else dropMessage += `📦 <strong>Obteve:</strong> ${item.name}<br>`;
-                }
-                if (pendingItems.length > freeSlots) {
-                    dropMessage += `<span style="color:#f44336">Mochila cheia! Alguns itens perdidos.</span><br>`;
-                    showPopup("Sua mochila encheu! Alguns itens não puderam ser recolhidos.");
-                }
+                player.inventory.push(pendingItem);
+                state.hasNewItem = true;
+                if(pendingItem.type === 'equip') dropMessage += `✨ <strong>Obteve:</strong> <span class="${pendingItem.rarity.color}">${pendingItem.name}</span> (+${pendingItem.statValue})<br>`;
+                else if(pendingItem.type === 'potion') dropMessage += `🧪 <strong>Obteve:</strong> ${pendingItem.name}<br>`;
+                else dropMessage += `📦 <strong>Obteve:</strong> ${pendingItem.name}<br>`;
             }
         } else {
             dropMessage += "<em>Nenhum item dropou.</em>";
         }
+        
         renderInventory(); return dropMessage;
     }
 
@@ -1006,14 +1037,19 @@
             actionMessage = `<strong>Falha Crítica!</strong><br>O ${enemy.emoji} ${enemy.name} revidou e você perdeu ${finalDmg} HP.`;
             
             let trapped = false;
-            if (player.hp > 0 && Math.random() * 100 <= mods.trapChance) trapped = true;
+            let currentTrapChance = getTrapChance(zIndex, eIndex);
+            
+            if (player.hp > 0 && Math.random() * 100 <= currentTrapChance) trapped = true;
 
             if (player.hp <= 0) {
-                player.hp = 0; state.faintedTime = 30 * 60; 
+                player.hp = 0; 
+                state.faintedTime = 30 * 60; 
+                state.penaltyCost = calculatePenalty(zIndex);
                 actionMessage += `<br><br>💀 <strong>VOCÊ DESMAIOU!</strong>`;
                 handleStatusClick();
             } else if (trapped) {
                 state.trappedTime = 30 * 60;
+                state.penaltyCost = calculatePenalty(zIndex);
                 actionMessage += `<br><br>🕸️ <strong>FALHA NA FUGA!</strong><br>Você ficou preso na área.`;
                 handleStatusClick();
             } else {
@@ -1213,27 +1249,28 @@
     function gameLoop() {
         let changed = false; let currentHouse = houses[player.houseIndex];
 
+        // HP/EN SEMPRE Regeneram agora, independentemente do status
+        state.hpTick++;
+        if (state.hpTick >= 2) { 
+            if (player.hp < player.maxHp) { player.hp = Math.min(player.maxHp, player.hp + (player.maxHp * currentHouse.hpRegen)); changed = true; }
+            state.hpTick = 0;
+        }
+        if (player.energy < player.maxEnergy) { player.energy = Math.min(player.maxEnergy, player.energy + currentHouse.enRegen); changed = true; }
+        if (state.cooldown > 0) { state.cooldown--; changed = true; }
+
         if (state.faintedTime > 0) {
             state.faintedTime--;
             if (state.faintedTime <= 0) { 
-                player.hp = player.maxHp; 
-                logConsole("✨ Você acordou do desmaio, mas se sente exausto!"); 
+                logConsole("✨ Seu tempo de desmaio passou. Você despertou!"); 
                 changed = true; 
             }
             if(state.faintedTime % 60 === 0 || state.faintedTime > 0) changed = true;
         } else if (state.trappedTime > 0) {
             state.trappedTime--;
-            if (state.trappedTime <= 0) { logConsole("💨 Você finalmente escapou."); changed = true; }
+            if (state.trappedTime <= 0) { logConsole("💨 A barra limpa. Você finalmente escapou do esconderijo."); changed = true; }
             if(state.trappedTime % 60 === 0 || state.trappedTime > 0) changed = true;
-        } else {
-            state.hpTick++;
-            if (state.hpTick >= 2) { 
-                if (player.hp < player.maxHp) { player.hp = Math.min(player.maxHp, player.hp + (player.maxHp * currentHouse.hpRegen)); changed = true; }
-                state.hpTick = 0;
-            }
-            if (player.energy < player.maxEnergy) { player.energy = Math.min(player.maxEnergy, player.energy + currentHouse.enRegen); changed = true; }
-            if (state.cooldown > 0) { state.cooldown--; changed = true; }
-        }
+        } 
+        
         if (changed) updateUI();
     }
 
@@ -1309,12 +1346,12 @@
         if (state.faintedTime > 0) {
             let m = Math.floor(state.faintedTime / 60).toString().padStart(2, '0');
             let s = (state.faintedTime % 60).toString().padStart(2, '0');
-            statusMsg = `💀 Desmaiado... Clique para Curar HP (5🪙) ou aguarde ${m}:${s}`;
+            statusMsg = `💀 Desmaiado... Clique pagar o resgate (${state.penaltyCost}🪙) ou aguarde ${m}:${s}`;
             disableAction = true; statusEl.classList.add('status-msg-clickable');
         } else if (state.trappedTime > 0) {
             let m = Math.floor(state.trappedTime / 60).toString().padStart(2, '0');
             let s = (state.trappedTime % 60).toString().padStart(2, '0');
-            statusMsg = `🕸️ Preso! Clique para Fugir (5🪙) ou aguarde ${m}:${s}`;
+            statusMsg = `🕸️ Preso! Clique para Fugir (${state.penaltyCost}🪙) ou aguarde ${m}:${s}`;
             disableAction = true; statusEl.classList.add('status-msg-clickable');
         } else {
             statusEl.classList.remove('status-msg-clickable');
