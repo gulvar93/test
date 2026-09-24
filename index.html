@@ -240,7 +240,7 @@
     <!-- 7. MENU RAID -->
     <div id="menu-raid" class="menu-section hidden">
         <h3>Expedições e Invasões</h3>
-        <p>Vá saquear locais próximos. Viagens levam tempo para ir e voltar. <strong>Ações na base ficarão bloqueadas.</strong></p>
+        <p>Procure locais próximos para saquear. Viagens levam tempo para ir e voltar. <strong>Ações na base ficarão bloqueadas.</strong></p>
         <div class="coord-box">
             <p style="margin:0; font-size: 13px; color:#aaa;">📍 Localização da sua Base (QG)<br><strong>[X: <span id="coord-x" style="color:#fff"></span> | Y: <span id="coord-y" style="color:#fff"></span>]</strong></p>
         </div>
@@ -338,7 +338,7 @@
             📋<span id="badge-missoes" class="badge hidden">!</span><span class="label">Missões</span>
         </button>
         <button class="nav-btn" id="nav-raid" onclick="showMenu('raid')">
-            ⚔️<span class="label">Raid</span>
+            ⚔️<span class="label">Raide</span>
         </button>
         <button class="nav-btn" id="nav-loja" onclick="showMenu('loja')">
             💰<span class="label">Loja</span>
@@ -399,11 +399,11 @@
 
     // --- BANCOS DE DADOS ---
     const houses = [
-        { name: 'Nenhuma (Rua)', emoji: '🛤️', hpRegen: 0.005, enRegen: 0.2, price: 0, desc: 'Base: 1 de Energia a cada 00:05 | 0.5% da Saúde a cada 00:02' },
-        { name: 'Cabana', emoji: '🏕️', hpRegen: 0.010, enRegen: 0.4, price: 200, desc: 'Adiciona: +1 de Energia a cada 00:05 | +0.5% de Saúde a cada 00:02' },
-        { name: 'Casa', emoji: '🏠', hpRegen: 0.015, enRegen: 0.6, price: 800, desc: 'Adiciona: +2 de Energia a cada 00:05 | +1.0% de Saúde a cada 00:02' },
-        { name: 'Forte', emoji: '🏰', hpRegen: 0.020, enRegen: 1.0, price: 3000, desc: 'Adiciona: +4 de Energia a cada 00:05 | +1.5% de Saúde a cada 00:02' },
-        { name: 'Castelo', emoji: '👑', hpRegen: 0.035, enRegen: 2.0, price: 10000, desc: 'Adiciona: +9 de Energia a cada 00:05 | +3.0% de Saúde a cada 00:02' }
+        { name: 'Rua', emoji: '🛤️', hpRegen: 0.005, enRegen: 0.2, price: 0, desc: 'Base: 1 de Energia a cada 00:05 | 0.5% da Saúde a cada 00:02' },
+        { name: 'Cabana', emoji: '🏕️', hpRegen: 0.010, enRegen: 0.4, price: 200, desc: 'Regen de Energia x2 | +0.5% de Saúde a cada 00:02' },
+        { name: 'Casa', emoji: '🏠', hpRegen: 0.015, enRegen: 0.6, price: 800, desc: 'Regen de Energia x3 | +1.0% de Saúde a cada 00:02' },
+        { name: 'Forte', emoji: '🏰', hpRegen: 0.020, enRegen: 1.0, price: 3000, desc: 'Regen de Energia x5 | +1.5% de Saúde a cada 00:02' },
+        { name: 'Castelo', emoji: '👑', hpRegen: 0.035, enRegen: 2.0, price: 10000, desc: 'Regen de Energia x10 | +3.0% de Saúde a cada 00:02' }
     ];
 
     const equipTypes = [
